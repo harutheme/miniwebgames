@@ -67,7 +67,7 @@ class Webgames_Social_Login {
                 'redirect_uri'  => urlencode( $callback_url . '&provider=facebook' ),
                 'state'         => $state,
                 'scope'         => 'email,public_profile',
-            ), 'https://www.facebook.com/v12.0/dialog/oauth' );
+            ), 'https://www.facebook.com/v19.0/dialog/oauth' );
 
             echo '<a href="' . esc_url( $fb_auth_url ) . '" class="wg-btn-social wg-btn-facebook">';
             echo '<svg width="18" height="18" viewBox="0 0 320 512"><path fill="#ffffff" d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg>';
@@ -177,7 +177,7 @@ class Webgames_Social_Login {
             'client_secret' => $app_secret,
             'redirect_uri'  => $callback_url,
             'code'          => $code,
-        ), 'https://graph.facebook.com/v12.0/oauth/access_token' );
+        ), 'https://graph.facebook.com/v19.0/oauth/access_token' );
 
         $response = wp_remote_get( $token_url );
 
@@ -203,7 +203,8 @@ class Webgames_Social_Login {
                 $this->redirect_with_error( 'Facebook Profile Error.', $redirect_to );
             }
         } else {
-            $this->redirect_with_error( 'Facebook Token Error. Please try again.', $redirect_to );
+            $error_msg = isset( $body['error']['message'] ) ? $body['error']['message'] : 'Unknown error';
+            $this->redirect_with_error( 'Facebook Token Error: ' . $error_msg, $redirect_to );
         }
     }
 
