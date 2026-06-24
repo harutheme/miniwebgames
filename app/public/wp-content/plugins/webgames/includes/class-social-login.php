@@ -36,7 +36,7 @@ class Webgames_Social_Login {
         }
 
         // Must use admin-ajax or a clean endpoint for callback
-        $callback_url = site_url( '?webgames_social_login=1' );
+        $callback_url = trailingslashit( site_url() ) . '?webgames_social_login=1';
         $current_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
         $state = base64_encode( json_encode( array(
             'redirect' => $current_url,
@@ -104,7 +104,7 @@ class Webgames_Social_Login {
             }
         }
 
-        $callback_url = site_url( '?webgames_social_login=1&provider=' . $provider );
+        $callback_url = trailingslashit( site_url() ) . '?webgames_social_login=1&provider=' . $provider;
 
         if ( $provider === 'google' ) {
             $this->process_google_login( $code, $callback_url, $redirect_to );

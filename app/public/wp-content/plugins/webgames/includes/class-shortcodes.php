@@ -599,7 +599,7 @@ class Webgames_Shortcodes {
         $google_id = get_option( 'webgames_google_client_id' );
         $facebook_id = get_option( 'webgames_facebook_app_id' );
 
-        $callback_url = site_url( '?webgames_social_login=1' );
+        $callback_url = trailingslashit( site_url() ) . '?webgames_social_login=1';
         $current_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
         $state = base64_encode( json_encode( array(
             'redirect' => $current_url,
