@@ -1,0 +1,33 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Webgames Scraper\n"
+"POT-Creation-Date: 2026-06-22 11:00+0700\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0.1\n"
+"Language: en_US\n"
+
+#: includes/class-single-scraper.php:15
+msgid "Game Scraper (Module 2)"
+msgstr ""
+
+#: includes/class-single-scraper.php:30
+msgid "Enter target URL (e.g., musicgames.io/game):"
+msgstr ""
+
+#: includes/class-single-scraper.php:32
+msgid "Fetch Game Data"
+msgstr ""
+
+#: includes/class-html5-downloader.php:15
+msgid "Source Downloader (Module 3)"
+msgstr ""
+
+#: includes/class-html5-downloader.php:30
+msgid "Enter iframe URL to download:"
+msgstr ""
+
+#: includes/class-html5-downloader.php:32
+msgid "Download to Local"
+msgstr ""

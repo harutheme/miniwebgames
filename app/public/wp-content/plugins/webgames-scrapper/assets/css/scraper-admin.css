@@ -1,0 +1,35 @@
+.wg-scraper-wrap {
+    padding: 10px 0;
+}
+
+.wg-scraper-wrap label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #1d2327;
+}
+
+.wg-scraper-wrap input[type="text"] {
+    margin-bottom: 12px;
+}
+
+.wg-btn-block {
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+.wg-status-msg {
+    margin-top: 10px;
+    font-size: 13px;
+    font-style: italic;
+    color: #007cba;
+}
+
+.wg-status-success {
+    color: #46b450;
+}
+
+.wg-status-error {
+    color: #dc3232;
+}

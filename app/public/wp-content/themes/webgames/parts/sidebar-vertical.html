@@ -1,0 +1,23 @@
+<!-- wp:group {"tagName":"aside","className":"wg-sidebar-vertical","layout":{"type":"default"}} -->
+<aside class="wp-block-group wg-sidebar-vertical" id="wg-sidebar-vertical">
+    
+    <!-- Home Link -->
+    <ul class="wg-cat-menu" style="margin-bottom: 20px;">
+        <li>
+            <a href="/">
+                <span class="dashicons dashicons-admin-home"></span> Home
+            </a>
+        </li>
+    </ul>
+
+    <!-- wp:heading {"level":4,"style":{"typography":{"textTransform":"uppercase","fontSize":"12px","letterSpacing":"1px"},"color":{"text":"#a4b0be"}}} -->
+    <h4 class="wp-block-heading has-text-color" style="color:#a4b0be;font-size:12px;letter-spacing:1px;text-transform:uppercase">Categories</h4>
+    <!-- /wp:heading -->
+
+    <!-- Dynamic Categories -->
+    <!-- wp:shortcode -->
+    [webgames_category_menu]
+    <!-- /wp:shortcode -->
+
+</aside>
+<!-- /wp:group -->

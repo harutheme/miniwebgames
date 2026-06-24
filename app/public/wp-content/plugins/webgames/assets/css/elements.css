@@ -1,0 +1,215 @@
+/* Global Elements CSS for Webgames */
+/* AI MUST update this file when introducing new common UI elements like buttons, forms, badges */
+
+/* Badges / Labels */
+.wg-label {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 3px;
+    color: #fff;
+    line-height: 1;
+    z-index: 3;
+    position: absolute;
+    top: -5px;
+    left: -5px;
+}
+
+.wg-label-hot {
+    background: linear-gradient(45deg, #ff4757, #ff6b81);
+    box-shadow: 0 0 5px rgba(255, 71, 87, 0.5);
+}
+
+.wg-label-new {
+    background: linear-gradient(45deg, #2ed573, #7bed9f);
+    box-shadow: 0 0 5px rgba(46, 213, 115, 0.5);
+}
+
+/* Forms Elements */
+.wg-form-control {
+    width: 100%;
+    padding: 10px;
+    background: #1e272e;
+    border: 1px solid #485460;
+    color: #d2dae2;
+    border-radius: 4px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.wg-form-control:focus {
+    border-color: #0fb9b1;
+    outline: none;
+}
+
+/* Buttons */
+.wg-btn-primary {
+    background: #0fb9b1;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.wg-btn-primary:hover {
+    background: #2bcbba;
+}
+
+.wg-btn-primary:active {
+    transform: scale(0.95);
+}
+
+/* Dashboard Layout Architecture */
+.wg-body-container {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    width: 100%;
+    min-height: calc(100vh - 60px); /* Adjust based on header height */
+    position: relative;
+    overflow-x: hidden;
+}
+
+.wg-sidebar-vertical {
+    width: 325px;
+    background: #111418;
+    border-right: 1px solid #1e272e;
+    flex-shrink: 0;
+    transition: margin-left 0.3s ease;
+    padding: 20px;
+    position: sticky;
+    top: 60px; /* Header height */
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+}
+
+.wg-sidebar-vertical.is-collapsed {
+    margin-left: -325px;
+}
+
+.wg-main-column {
+    flex-grow: 1;
+    min-width: 0; /* Prevents flex children from overflowing */
+    padding: 0;
+}
+
+.wg-top-header {
+    height: 60px;
+    background: #111418;
+    border-bottom: 1px solid #1e272e;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.wg-header-left, .wg-header-center, .wg-header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.wg-header-center {
+    flex-grow: 1;
+    max-width: 600px;
+    margin: 0 20px;
+}
+
+.wg-btn-toggle-sidebar {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Category Menu */
+.wg-cat-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.wg-cat-menu li a {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    color: #d2dae2;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background 0.2s;
+    gap: 10px;
+}
+.wg-cat-menu li a:hover {
+    background: #1e272e;
+    color: #0fb9b1;
+}
+
+/* Breadcrumbs */
+.wg-breadcrumbs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.wg-breadcrumb-sep {
+    margin: 0 8px;
+    color: #a4b0be;
+    font-size: 14px;
+}
+
+.wg-breadcrumb-home {
+    color: #ff4757;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.wg-breadcrumb-home .dashicons {
+    font-size: 16px;
+    line-height: inherit;
+}
+
+.wg-breadcrumb-cat {
+    color: #a4b0be;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.wg-breadcrumb-cat:hover {
+    color: #ff4757;
+}
+
+.wg-breadcrumb-current {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .wg-sidebar-vertical {
+        position: fixed;
+        left: 0;
+        z-index: 99;
+        margin-left: -250px;
+    }
+    .wg-sidebar-vertical.is-mobile-open {
+        margin-left: 0;
+    }
+    .wg-header-center {
+        display: none; /* Hide search on mobile or make it smaller */
+    }
+}
+
