@@ -627,7 +627,7 @@ class Webgames_Shortcodes {
                         <?php if ( ! empty( $google_id ) ) : 
                             $google_auth_url = add_query_arg( array(
                                 'client_id'     => $google_id,
-                                'redirect_uri'  => $callback_url . '&provider=google',
+                                'redirect_uri'  => urlencode( $callback_url . '&provider=google' ),
                                 'response_type' => 'code',
                                 'scope'         => 'email profile',
                                 'state'         => $state,
@@ -642,7 +642,7 @@ class Webgames_Shortcodes {
                         <?php if ( ! empty( $facebook_id ) ) : 
                             $fb_auth_url = add_query_arg( array(
                                 'client_id'     => $facebook_id,
-                                'redirect_uri'  => $callback_url . '&provider=facebook',
+                                'redirect_uri'  => urlencode( $callback_url . '&provider=facebook' ),
                                 'state'         => $state,
                                 'scope'         => 'email,public_profile',
                             ), 'https://www.facebook.com/v19.0/dialog/oauth' );
