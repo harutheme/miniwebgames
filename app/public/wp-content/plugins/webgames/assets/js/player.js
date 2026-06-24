@@ -18,17 +18,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- 2. Fullscreen ---
     const fsBtn = document.getElementById('wg-btn-fullscreen');
-    const playerWrapper = document.getElementById('webgames-player-wrapper');
-    if (fsBtn && playerWrapper) {
+    const exitFsBtn = document.getElementById('wg-btn-exit-fullscreen');
+    const canvasContainer = document.getElementById('webgames-canvas-container');
+
+    if (fsBtn && canvasContainer) {
         fsBtn.addEventListener('click', function() {
-            if (!document.fullscreenElement) {
-                playerWrapper.requestFullscreen().catch(err => {
-                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-                });
-            } else {
-                document.exitFullscreen();
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (canvasContainer.requestFullscreen) {
+                    canvasContainer.requestFullscreen().catch(err => {
+                        console.warn(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                    });
+                } else if (canvasContainer.webkitRequestFullscreen) {
+                    canvasContainer.webkitRequestFullscreen();
+                }
             }
         });
+
+        if (exitFsBtn) {
+            exitFsBtn.addEventListener('click', function() {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            });
+        }
+
+        const handleFullscreenChange = () => {
+            if (document.fullscreenElement || document.webkitFullscreenElement) {
+                if (exitFsBtn) exitFsBtn.style.display = 'flex';
+            } else {
+                if (exitFsBtn) exitFsBtn.style.display = 'none';
+            }
+        };
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
     }
 
     // Old Share Logic Removed

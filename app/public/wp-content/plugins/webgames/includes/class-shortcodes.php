@@ -15,6 +15,7 @@ class Webgames_Shortcodes {
         add_shortcode( 'webgames_breadcrumbs', array( $this, 'render_breadcrumbs' ) );
         add_shortcode( 'webgames_archive_content', array( $this, 'archive_content_shortcode' ) );
         add_shortcode( 'webgames_rating', array( $this, 'render_rating' ) );
+        add_shortcode( 'webgames_header_user', array( $this, 'render_header_user' ) );
     }
 
     public function register_assets() {
@@ -102,7 +103,10 @@ class Webgames_Shortcodes {
         ?>
         <div class="webgames-player-wrapper" id="webgames-player-wrapper">
             <!-- Game Canvas / Iframe Area -->
-            <div class="webgames-canvas-container">
+            <div class="webgames-canvas-container" id="webgames-canvas-container">
+                <button class="wg-btn-exit-fullscreen" id="wg-btn-exit-fullscreen" style="display: none;" title="<?php _e('Exit Fullscreen', 'webgames'); ?>">
+                    <span class="dashicons dashicons-editor-contract"></span>
+                </button>
                 <div class="webgames-cover" id="webgames-cover" style="background-image: url('<?php echo esc_url( $cover_url ); ?>');">
                     <button class="webgames-play-btn" id="webgames-play-btn" data-src="<?php echo esc_url( $game_url ); ?>">
                         <span class="dashicons dashicons-controls-play"></span> <?php _e( 'PLAY NOW', 'webgames' ); ?>
@@ -589,5 +593,167 @@ class Webgames_Shortcodes {
         </div>
         <?php
         return ob_get_clean();
+    }
+
+    public function render_header_user( $atts ) {
+        $google_id = get_option( 'webgames_google_client_id' );
+        $facebook_id = get_option( 'webgames_facebook_app_id' );
+
+        $callback_url = site_url( '?webgames_social_login=1' );
+        $current_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $state = base64_encode( json_encode( array(
+            'redirect' => $current_url,
+            'nonce'    => wp_create_nonce( 'wg_social_login_nonce' )
+        ) ) );
+
+        ob_start();
+        ?>
+        <div class="wg-header-user-wrapper" style="opacity: 0; transition: opacity 0.3s; position: relative;">
+            
+            <!-- Logged OUT State -->
+            <div class="wg-header-logged-out" style="display: none;">
+                <button class="wg-btn wg-btn-primary wg-btn-header-login" style="padding: 5px 15px; font-size: 14px;">
+                    <?php _e( 'Login', 'webgames' ); ?>
+                </button>
+
+                <!-- Login Modal -->
+                <div class="wg-login-modal-overlay wg-header-login-modal" style="display: none;">
+                    <div class="wg-login-modal">
+                        <button class="wg-btn-close-modal"><span class="dashicons dashicons-no-alt"></span></button>
+                        <h3 style="margin-top:0; color:#fff; text-align:center;"><?php _e( 'Login to Play', 'webgames' ); ?></h3>
+                        <p style="text-align:center; color:#a4b0be; margin-bottom: 20px; font-size: 14px;"><?php _e( 'Choose a social account to continue', 'webgames' ); ?></p>
+                        
+                        <div class="wg-social-login-buttons" style="flex-direction: column;">
+                        <?php if ( ! empty( $google_id ) ) : 
+                            $google_auth_url = add_query_arg( array(
+                                'client_id'     => $google_id,
+                                'redirect_uri'  => urlencode( $callback_url . '&provider=google' ),
+                                'response_type' => 'code',
+                                'scope'         => 'email profile',
+                                'state'         => $state,
+                            ), 'https://accounts.google.com/o/oauth2/v2/auth' );
+                        ?>
+                            <a href="<?php echo esc_url( $google_auth_url ); ?>" class="wg-btn-social wg-btn-google" style="width: 100%;">
+                                <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                                <span><?php _e( 'Continue with Google', 'webgames' ); ?></span>
+                            </a>
+                        <?php endif; ?>
+
+                        <?php if ( ! empty( $facebook_id ) ) : 
+                            $fb_auth_url = add_query_arg( array(
+                                'client_id'     => $facebook_id,
+                                'redirect_uri'  => urlencode( $callback_url . '&provider=facebook' ),
+                                'state'         => $state,
+                                'scope'         => 'email,public_profile',
+                            ), 'https://www.facebook.com/v12.0/dialog/oauth' );
+                        ?>
+                            <a href="<?php echo esc_url( $fb_auth_url ); ?>" class="wg-btn-social wg-btn-facebook" style="width: 100%;">
+                                <svg width="18" height="18" viewBox="0 0 320 512"><path fill="#ffffff" d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg>
+                                <span><?php _e( 'Continue with Facebook', 'webgames' ); ?></span>
+                            </a>
+                        <?php endif; ?>
+                        <?php if ( empty( $google_id ) && empty( $facebook_id ) ) : ?>
+                            <a href="<?php echo esc_url( wp_login_url( $current_url ) ); ?>" class="wg-btn wg-btn-primary" style="width: 100%; text-align:center;"><?php _e('Normal Login', 'webgames'); ?></a>
+                        <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logged IN State -->
+            <div class="wg-header-logged-in" style="display: none; position: relative;">
+                <button class="wg-header-profile-btn">
+                    <img class="wg-header-avatar" src="" alt="Avatar" width="24" height="24" style="border-radius: 50%; object-fit: cover;">
+                    <span class="wg-header-name" style="font-size: 14px; font-weight: 600; color: #fff;"></span>
+                    <span class="dashicons dashicons-arrow-down-alt2" style="font-size: 14px; line-height: 24px; color: #a4b0be;"></span>
+                </button>
+                <div class="wg-header-profile-menu" style="display:none;">
+                    <a href="<?php echo esc_url( wp_logout_url( $current_url ) ); ?>" class="wg-logout-link">
+                        <span class="dashicons dashicons-external"></span> <?php _e( 'Logout', 'webgames' ); ?>
+                    </a>
+                </div>
+            </div>
+            
+        </div>
+        
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var wrappers = document.querySelectorAll('.wg-header-user-wrapper');
+            if (wrappers.length === 0) return;
+
+            var getCookie = function(name) {
+                var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+                if (match) return match[2];
+                return null;
+            };
+
+            var userInfo = null;
+            var userInfoBase64 = getCookie('wg_user_info');
+            if (userInfoBase64) {
+                try {
+                    var userInfoStr = atob(decodeURIComponent(userInfoBase64));
+                    userInfo = JSON.parse(userInfoStr);
+                } catch(e) {}
+            }
+
+            wrappers.forEach(function(wrapper) {
+                var loggedOut = wrapper.querySelector('.wg-header-logged-out');
+                var loggedIn = wrapper.querySelector('.wg-header-logged-in');
+                
+                if (userInfo && userInfo.name) {
+                    var nameEl = wrapper.querySelector('.wg-header-name');
+                    var avatarEl = wrapper.querySelector('.wg-header-avatar');
+                    if (nameEl) nameEl.textContent = userInfo.name;
+                    if (avatarEl) {
+                        if (userInfo.avatar) {
+                            avatarEl.src = userInfo.avatar;
+                        } else {
+                            avatarEl.style.display = 'none';
+                        }
+                    }
+                    if (loggedIn) loggedIn.style.display = 'block';
+                } else {
+                    if (loggedOut) loggedOut.style.display = 'block';
+                }
+                wrapper.style.opacity = '1';
+                var btnLogin = wrapper.querySelector('.wg-btn-header-login');
+                var modal = wrapper.querySelector('.wg-header-login-modal');
+                var btnClose = wrapper.querySelector('.wg-btn-close-modal');
+                if (btnLogin && modal) {
+                    btnLogin.addEventListener('click', function() {
+                        modal.style.display = 'flex';
+                    });
+                    if (btnClose) {
+                        btnClose.addEventListener('click', function() {
+                            modal.style.display = 'none';
+                        });
+                    }
+                    modal.addEventListener('click', function(e) {
+                        if (e.target === modal) {
+                            modal.style.display = 'none';
+                        }
+                    });
+                }
+                var profileBtn = wrapper.querySelector('.wg-header-profile-btn');
+                var profileMenu = wrapper.querySelector('.wg-header-profile-menu');
+                if (profileBtn && profileMenu) {
+                    profileBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        profileMenu.style.display = profileMenu.style.display === 'none' ? 'block' : 'none';
+                    });
+                }
+            });
+            document.addEventListener('click', function() {
+                var menus = document.querySelectorAll('.wg-header-profile-menu');
+                menus.forEach(function(menu) {
+                    menu.style.display = 'none';
+                });
+            });
+        });
+        </script>
+        <?php
+        $html = ob_get_clean();
+        $html = str_replace( array( "\r\n", "\r", "\n", "\t" ), '', $html );
+        return $html;
     }
 }

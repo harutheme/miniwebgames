@@ -29,9 +29,11 @@ require_once WEBGAMES_PLUGIN_DIR . 'includes/class-settings-page.php';
 require_once WEBGAMES_PLUGIN_DIR . 'includes/class-ads-manager.php';
 require_once WEBGAMES_PLUGIN_DIR . 'includes/class-ajax-handler.php';
 require_once WEBGAMES_PLUGIN_DIR . 'includes/class-comment-spam.php';
+require_once WEBGAMES_PLUGIN_DIR . 'includes/class-social-login.php';
 require_once WEBGAMES_PLUGIN_DIR . 'includes/class-shortcodes.php';
 
 // Initialize classes
+new Webgames_Social_Login();
 new Webgames_CPT_Game();
 new Webgames_CPT_Report();
 new Webgames_ACF_Fields();

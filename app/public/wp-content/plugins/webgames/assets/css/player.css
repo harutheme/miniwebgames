@@ -860,6 +860,52 @@
     border-radius: 8px;
 }
 
+/* ==========================================
+   FULLSCREEN MODE (OPTION 2)
+   ========================================== */
+.wg-btn-exit-fullscreen {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 99999;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.wg-btn-exit-fullscreen:hover {
+    background: rgba(255, 71, 87, 0.9);
+    transform: scale(1.1);
+}
+
+.wg-btn-exit-fullscreen .dashicons {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+}
+
+.webgames-canvas-container:fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+    background: #000 !important;
+}
+
+.webgames-canvas-container:-webkit-full-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+    background: #000 !important;
+}
+
 /* Mobile Archive Responsive */
 @media (max-width: 576px) {
     .wg-archive-grid-wrapper {

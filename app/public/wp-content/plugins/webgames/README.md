@@ -9,9 +9,10 @@ This plugin powers the Mini Web Games platform by registering the core data stru
   - `class-cpt-report.php`: Registers `game-report` CPT for error tracking.
   - `class-acf-fields.php`: Registers ACF field group for `game` (Source Type, URL, Cover).
   - `class-shortcodes.php`: Handles `[webgames_player]` and `[webgames_sidebar_list]`.
-  - `class-settings-page.php`: Admin menu "Webgames Settings" for Global Scripts & Ads.
+  - `class-settings-page.php`: Admin menu "Webgames Settings" with Tabs for (1) Global Scripts & Ads and (2) Social Login Configuration.
   - `class-ads-manager.php`: Outputs CMP scripts in `<head>` and renders ad shortcodes.
   - `class-ajax-handler.php`: Handles AJAX for Like, Dislike, Report.
+  - `class-social-login.php`: Handles custom OAuth 2.0 flow for Google & Facebook Login.
   - `class-comment-spam.php`: Adds honeypot to comments and prevents spam bots.
 - `assets/`:
   - `css/elements.css`: Global UI components (Labels, Buttons, Forms). MUST be updated when adding new standard components.
@@ -34,3 +35,15 @@ This plugin powers the Mini Web Games platform by registering the core data stru
 
 ## Anti-Spam
 - Commenting relies on native WP Guest Comments (to capture emails safely) but is fortified with a CSS-hidden `website_url` input. If filled, the comment is rejected.
+
+## Social Login
+- A custom, lightweight OAuth 2.0 implementation is available via `class-social-login.php`.
+- Supported Providers: **Google** and **Facebook**.
+- Settings: API Keys and Secrets are configured in **Games -> Settings -> Social Login** tab.
+- Callback URIs for Apps:
+  - Google: `https://your-domain.com/?webgames_social_login=1&provider=google`
+  - Facebook: `https://your-domain.com/?webgames_social_login=1&provider=facebook`
+- **Case Handling:**
+  - Auto creates WP user if email is new.
+  - Auto merges and logs in if email already exists in WP.
+  - Blocks Facebook login gracefully if no email is provided (since WP requires an email).

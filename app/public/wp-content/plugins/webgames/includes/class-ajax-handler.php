@@ -150,6 +150,15 @@ class Webgames_Ajax_Handler {
             wp_die();
         }
 
+        $meta_input = array(
+            'reported_game_id' => $post_id,
+            'reporter_ip'      => $ip,
+        );
+
+        if ( is_user_logged_in() ) {
+            $meta_input['reporter_user_id'] = get_current_user_id();
+        }
+
         // Create Report Post
         $game_title = get_the_title( $post_id );
         $report_id = wp_insert_post( array(
@@ -157,10 +166,7 @@ class Webgames_Ajax_Handler {
             'post_title'   => sprintf( __( 'Report: %s', 'webgames' ), $game_title ),
             'post_content' => $reason,
             'post_status'  => 'publish',
-            'meta_input'   => array(
-                'reported_game_id' => $post_id,
-                'reporter_ip'      => $ip,
-            ),
+            'meta_input'   => $meta_input,
         ) );
 
         if ( $report_id && ! is_wp_error( $report_id ) ) {

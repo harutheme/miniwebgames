@@ -8,6 +8,8 @@ class Webgames_CPT_Report {
 
     public function __construct() {
         add_action( 'init', array( $this, 'register_cpt' ) );
+        add_filter( 'manage_game-report_posts_columns', array( $this, 'custom_columns' ) );
+        add_action( 'manage_game-report_posts_custom_column', array( $this, 'custom_column_data' ), 10, 2 );
     }
 
     public function register_cpt() {
@@ -44,5 +46,68 @@ class Webgames_CPT_Report {
             'map_meta_cap' => true,
         );
         register_post_type( 'game-report', $args );
+    }
+
+    public function custom_columns( $columns ) {
+        $new_columns = array();
+        if ( isset( $columns['cb'] ) ) {
+            $new_columns['cb'] = $columns['cb'];
+        }
+        $new_columns['title'] = __( 'Title', 'webgames' );
+        $new_columns['report_content'] = __( 'Content', 'webgames' );
+        $new_columns['reported_game'] = __( 'Edit Game', 'webgames' );
+        $new_columns['reporter_info'] = __( 'Reporter', 'webgames' );
+        $new_columns['date'] = __( 'Date', 'webgames' );
+        
+        return $new_columns;
+    }
+
+    public function custom_column_data( $column, $post_id ) {
+        switch ( $column ) {
+            case 'report_content':
+                $content = get_post_field( 'post_content', $post_id );
+                if ( mb_strlen( $content ) > 100 ) {
+                    echo esc_html( mb_substr( $content, 0, 100 ) . '...' );
+                } else {
+                    echo esc_html( $content );
+                }
+                break;
+                
+            case 'reported_game':
+                $game_id = get_post_meta( $post_id, 'reported_game_id', true );
+                if ( $game_id ) {
+                    $edit_link = get_edit_post_link( $game_id );
+                    $game_title = get_the_title( $game_id );
+                    if ( $edit_link ) {
+                        echo '<a href="' . esc_url( $edit_link ) . '">' . esc_html( $game_title ) . '</a>';
+                    } else {
+                        echo esc_html( $game_title );
+                    }
+                } else {
+                    echo 'N/A';
+                }
+                break;
+                
+            case 'reporter_info':
+                $ip = get_post_meta( $post_id, 'reporter_ip', true );
+                $user_id = get_post_meta( $post_id, 'reporter_user_id', true );
+                
+                if ( $user_id ) {
+                    $user_info = get_userdata( $user_id );
+                    if ( $user_info ) {
+                        $edit_user_link = get_edit_user_link( $user_id );
+                        echo '<strong>User:</strong> <a href="' . esc_url( $edit_user_link ) . '">' . esc_html( $user_info->user_login ) . '</a><br>';
+                    } else {
+                        echo '<strong>User:</strong> ID ' . esc_html( $user_id ) . '<br>';
+                    }
+                } else {
+                    echo '<strong>User:</strong> Guest<br>';
+                }
+                
+                if ( $ip ) {
+                    echo '<strong>IP:</strong> ' . esc_html( $ip );
+                }
+                break;
+        }
     }
 }
