@@ -157,3 +157,64 @@ if ( ! function_exists( 'webgames_format_binding' ) ) :
 		}
 	}
 endif;
+
+// Temporary FSE recovery script
+add_action('init', function() {
+    if (isset($_GET['clear_fse'])) {
+        global $wpdb;
+        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_theme_%' OR option_name LIKE '_transient_timeout_theme_%' OR option_name LIKE '_transient_wp_core_block_css%'");
+        
+        $corrupted = array('sidebar-vertical', 'header', 'footer');
+        foreach ($corrupted as $slug) {
+            $post = get_page_by_path($slug, OBJECT, 'wp_template_part');
+            if ($post) {
+                wp_delete_post($post->ID, true);
+            }
+        }
+        
+        die('<h1>FSE Fixed!</h1><p>Cache Cleared and Corrupted DB Parts Deleted!</p><p>Please close this tab and go back to your Site Editor and refresh.</p>');
+    }
+    
+    // Fix HTTP/HTTPS REST API Nonce mismatch
+    if ( is_admin() && current_user_can('manage_options') ) {
+        $site_url = get_option('siteurl');
+        if (strpos($site_url, 'http://') === 0 && isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+            update_option('siteurl', str_replace('http://', 'https://', $site_url));
+            update_option('home', str_replace('http://', 'https://', get_option('home')));
+        }
+    }
+});
+
+// Game Sorting Logic
+add_action('pre_get_posts', function($query) {
+    if ( is_admin() || ! $query->is_main_query() ) return;
+
+    if ( $query->get('post_type') === 'game' || is_tax('game_cat') || is_tax('game_tag') || is_post_type_archive('game') ) {
+        $sort = isset($_GET['sort']) ? sanitize_text_field($_GET['sort']) : '';
+        
+        switch ($sort) {
+            case 'popular':
+                $query->set('meta_key', 'wg_views');
+                $query->set('orderby', 'meta_value_num');
+                $query->set('order', 'DESC');
+                break;
+            case 'hot':
+                $query->set('meta_key', 'wg_views');
+                $query->set('orderby', 'meta_value_num');
+                $query->set('order', 'DESC');
+                $query->set('date_query', array(
+                    array('after' => '30 days ago')
+                ));
+                break;
+            case 'rating':
+                $query->set('meta_key', '_game_rating');
+                $query->set('orderby', 'meta_value_num');
+                $query->set('order', 'DESC');
+                break;
+            case 'new':
+                $query->set('orderby', 'date');
+                $query->set('order', 'DESC');
+                break;
+        }
+    }
+});

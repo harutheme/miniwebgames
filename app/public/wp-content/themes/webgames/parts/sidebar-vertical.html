@@ -1,23 +1,58 @@
 <!-- wp:group {"tagName":"aside","className":"wg-sidebar-vertical","layout":{"type":"default"}} -->
 <aside class="wp-block-group wg-sidebar-vertical" id="wg-sidebar-vertical">
     
-    <!-- Home Link -->
-    <ul class="wg-cat-menu" style="margin-bottom: 20px;">
-        <li>
-            <a href="/">
-                <span class="dashicons dashicons-admin-home"></span> Home
-            </a>
-        </li>
-    </ul>
+    <!-- wp:group {"className":"wg-sidebar-inner","layout":{"type":"flex","orientation":"vertical","flexWrap":"nowrap"}} -->
+    <div class="wp-block-group wg-sidebar-inner">
+        
+        <!-- wp:group {"className":"wg-sidebar-scroll-area","layout":{"type":"default"}} -->
+        <div class="wp-block-group wg-sidebar-scroll-area">
+            <!-- wp:heading {"level":4,"className":"wg-cat-heading","style":{"typography":{"textTransform":"uppercase","fontSize":"12px","letterSpacing":"1px"},"color":{"text":"#a4b0be"}}} -->
+            <h4 class="wp-block-heading wg-cat-heading has-text-color" style="color:#a4b0be;font-size:12px;letter-spacing:1px;text-transform:uppercase">Discover</h4>
+            <!-- /wp:heading -->
 
-    <!-- wp:heading {"level":4,"style":{"typography":{"textTransform":"uppercase","fontSize":"12px","letterSpacing":"1px"},"color":{"text":"#a4b0be"}}} -->
-    <h4 class="wp-block-heading has-text-color" style="color:#a4b0be;font-size:12px;letter-spacing:1px;text-transform:uppercase">Categories</h4>
-    <!-- /wp:heading -->
+            <!-- wp:shortcode -->
+            [webgames_discover_menu]
+            <!-- /wp:shortcode -->
 
-    <!-- Dynamic Categories -->
-    <!-- wp:shortcode -->
-    [webgames_category_menu]
-    <!-- /wp:shortcode -->
+            <!-- wp:navigation {"overlayMenu":"never","className":"wg-cat-menu wg-discover-menu"} -->
+            <!-- wp:navigation-link {"label":"[icon:backup] Recently Played","type":"page","url":"/recently-played/"} /-->
+            <!-- wp:navigation-link {"label":"[icon:heart] Favorites","type":"page","url":"/favorite-games/"} /-->
+            <!-- /wp:navigation -->
 
+            <!-- wp:heading {"level":4,"style":{"typography":{"textTransform":"uppercase","fontSize":"12px","letterSpacing":"1px"},"color":{"text":"#a4b0be"}}} -->
+            <h4 class="wp-block-heading has-text-color wg-cat-heading" style="color:#a4b0be;font-size:12px;letter-spacing:1px;text-transform:uppercase">Categories</h4>
+            <!-- /wp:heading -->
+
+            <!-- wp:shortcode -->
+            [webgames_category_menu]
+            <!-- /wp:shortcode -->
+
+            <!-- wp:navigation {"overlayMenu":"never","className":"wg-cat-menu wg-discover-menu"} -->
+            <!-- wp:navigation-link {"label":"[icon:tag] All Tags","type":"page","url":"/all-tags/"} /-->
+            <!-- /wp:navigation -->
+        </div>
+        <!-- /wp:group -->
+
+        <!-- wp:group {"className":"wg-sidebar-footer","layout":{"type":"default"}} -->
+        <div class="wp-block-group wg-sidebar-footer">
+            <!-- wp:navigation {"overlayMenu":"never","style":{"typography":{"fontSize":"12px"}},"layout":{"type":"flex","flexWrap":"wrap"}} /-->
+
+            <!-- wp:social-links {"iconColor":"white","iconColorValue":"#ffffff","iconBackgroundColor":"background","iconBackgroundColorValue":"#111418","size":"has-small-icon-size","style":{"spacing":{"blockGap":{"top":"5px","left":"5px"}}}} -->
+            <ul class="wp-block-social-links has-small-icon-size has-icon-color has-icon-background-color">
+                <!-- wp:social-link {"url":"#","service":"facebook"} /-->
+                <!-- wp:social-link {"url":"#","service":"x"} /-->
+                <!-- wp:social-link {"url":"#","service":"youtube"} /-->
+            </ul>
+            <!-- /wp:social-links -->
+
+            <!-- wp:paragraph {"style":{"typography":{"fontSize":"11px"},"color":{"text":"#a4b0be"}}} -->
+            <p class="has-text-color wg-sidebar-copyright" style="color:#a4b0be;font-size:11px">© 2026 MiniWebGames.</p>
+            <!-- /wp:paragraph -->
+        </div>
+        <!-- /wp:group -->
+        
+    </div>
+    <!-- /wp:group -->
+    
 </aside>
 <!-- /wp:group -->

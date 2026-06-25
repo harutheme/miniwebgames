@@ -1,0 +1,30 @@
+@@ -19,6 +19,7 @@
+         add_shortcode( 'webgames_terms', array( $this, 'terms_shortcode' ) );
+         add_shortcode( 'webgames_game_slider', array( $this, 'game_slider_shortcode' ) );
+         add_shortcode( 'webgames_discover_menu', array( $this, 'discover_menu_shortcode' ) );
++        add_shortcode( 'webgames_home_ad', array( $this, 'home_ad_shortcode' ) );
+ 
+         add_action( 'wp_ajax_webgames_get_favorites', array( $this, 'ajax_get_favorites' ) );
+         add_action( 'wp_ajax_nopriv_webgames_get_favorites', array( $this, 'ajax_get_favorites' ) );
+@@ -1480,6 +1481,21 @@
+         return ob_get_clean();
+     }
+ 
++    public function home_ad_shortcode() {
++        $ad_code = get_option( 'webgames_home_ad_code' );
++        if ( empty( $ad_code ) ) {
++            return '';
++        }
++        ob_start();
++        ?>
++        <div class="wg-home-ad-wrapper" style="margin-bottom: 20px; display: flex; justify-content: center; overflow: hidden; border-radius: 12px; background: #111418; padding: 10px;">
++            <?php echo do_shortcode( $ad_code ); ?>
++        </div>
++        <?php
++        $html = ob_get_clean();
++        return str_replace( array( "\r\n", "\r", "\n", "\t" ), '', $html );
++    }
++
+ }
+ 
+ new Webgames_Shortcodes();

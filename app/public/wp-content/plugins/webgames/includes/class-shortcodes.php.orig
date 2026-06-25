@@ -29,7 +29,6 @@ class Webgames_Shortcodes {
         add_shortcode( 'webgames_discover_menu', array( $this, 'discover_menu_shortcode' ) );
         add_shortcode( 'webgames_all_tags', array( $this, 'all_tags_shortcode' ) );
         add_shortcode( 'webgames_game_slider', array( $this, 'game_slider_shortcode' ) );
-        add_shortcode( 'webgames_home_ad', array( $this, 'home_ad_shortcode' ) );
 
         // Magic tag filter for icon
         add_filter( 'render_block_core/navigation-link', array( $this, 'filter_nav_link_icon' ), 10, 2 );
@@ -1584,19 +1583,5 @@ class Webgames_Shortcodes {
         </div>
         <?php
         return ob_get_clean();
-    }
-    public function home_ad_shortcode() {
-        $ad_code = get_option( 'webgames_home_ad_code' );
-        if ( empty( $ad_code ) ) {
-            return '';
-        }
-        ob_start();
-        ?>
-        <div class="wg-home-ad-wrapper" style="margin-bottom: 20px; display: flex; justify-content: center; overflow: hidden; border-radius: 12px; background: #111418; padding: 10px;">
-            <?php echo do_shortcode( $ad_code ); ?>
-        </div>
-        <?php
-        $html = ob_get_clean();
-        return str_replace( array( "\r\n", "\r", "\n", "\t" ), '', $html );
     }
 }

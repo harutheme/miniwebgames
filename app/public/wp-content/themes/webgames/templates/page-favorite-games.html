@@ -1,0 +1,38 @@
+<!-- wp:template-part {"slug":"header"} /-->
+
+<!-- wp:group {"tagName":"div","className":"wg-body-container","layout":{"type":"default"}} -->
+<div class="wp-block-group wg-body-container">
+    
+    <!-- wp:template-part {"slug":"sidebar-vertical"} /-->
+
+    <!-- wp:group {"tagName":"main","className":"wg-main-column","layout":{"type":"default"}} -->
+    <main class="wp-block-group wg-main-column">
+        
+        <!-- Top Ad Placeholder -->
+        <!-- wp:group {"style":{"spacing":{"margin":{"bottom":"20px","top":"20px"}}},"layout":{"type":"default"}} -->
+        <div class="wp-block-group" style="margin-top:20px;margin-bottom:20px;text-align:center;">
+            <!-- wp:html -->
+            <div class="wg-top-ad-placeholder" style="background: #2f3542; color: #fff; border-radius: 8px; padding: 20px; width: 100%; max-width: 728px; margin: 0 auto; display: flex; align-items: center; justify-content: center; min-height: 90px;">
+                Top Leaderboard Ad (728x90)
+            </div>
+            <!-- /wp:html -->
+        </div>
+        <!-- /wp:group -->
+
+        <!-- Main Archive Content (Shortcode) -->
+        <!-- wp:group {"style":{"spacing":{"padding":{"right":"20px","left":"20px"}}},"layout":{"type":"default"}} -->
+        <div class="wp-block-group" style="padding-right:20px;padding-left:20px">
+            <!-- wp:shortcode -->
+            [webgames_favorite_games]
+            <!-- /wp:shortcode -->
+        </div>
+        <!-- /wp:group -->
+        
+
+        <!-- wp:template-part {"slug":"footer"} /-->
+        
+    </main>
+    <!-- /wp:group -->
+
+</div>
+<!-- /wp:group -->

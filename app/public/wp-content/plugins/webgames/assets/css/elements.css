@@ -65,37 +65,131 @@
 }
 
 /* Dashboard Layout Architecture */
+:where(.wp-site-blocks)>* {
+    margin-block-start: 0 !important;
+    margin-block-end: 0 !important;
+}
+
 .wg-body-container {
     display: flex;
     flex-wrap: nowrap;
     align-items: stretch;
     width: 100%;
-    min-height: calc(100vh - 60px); /* Adjust based on header height */
+    min-height: calc(100vh - 60px);
+    /* Adjust based on header height */
     position: relative;
-    overflow-x: hidden;
+    overflow-x: clip;
+    margin-top: 0 !important;
+}
+
+/* Sidebar Template Part Sticky Wrapper (Fallback) */
+.wp-block-template-part:has(.wg-sidebar-vertical) {
+    z-index: 90;
 }
 
 .wg-sidebar-vertical {
-    width: 325px;
-    background: #111418;
-    border-right: 1px solid #1e272e;
+    width: 220px;
     flex-shrink: 0;
-    transition: margin-left 0.3s ease;
-    padding: 20px;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+    box-sizing: border-box;
+    margin-top: 0 !important;
     position: sticky;
-    top: 60px; /* Header height */
+    top: 60px;
     height: calc(100vh - 60px);
-    overflow-y: auto;
+    z-index: 90;
 }
 
-.wg-sidebar-vertical.is-collapsed {
-    margin-left: -325px;
+.wg-sidebar-inner {
+    width: 220px;
+    height: 100%;
+    background: #111418;
+    border-right: 1px solid #1e272e;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: width 0.3s ease;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.wg-sidebar-scroll-area {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+.wg-sidebar-footer {
+    flex-shrink: 0;
+    padding: 20px;
+    border-top: 1px solid #1e272e;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: #111418;
+    /* Ensure footer has background */
+    position: relative;
+    z-index: 5;
+}
+
+/* Hide footer text gracefully in mini mode */
+.wg-sidebar-vertical .wg-sidebar-copyright,
+.wg-sidebar-vertical .wp-block-navigation {
+    transition: opacity 0.2s, visibility 0.2s;
+}
+
+.wg-sidebar-vertical:hover .wg-sidebar-copyright,
+.wg-sidebar-vertical:hover .wp-block-navigation {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Custom Scrollbar for Sidebar */
+.wg-sidebar-inner::-webkit-scrollbar {
+    width: 6px;
+}
+
+.wg-sidebar-inner::-webkit-scrollbar-track {
+    background: #111418;
+}
+
+.wg-sidebar-inner::-webkit-scrollbar-thumb {
+    background: #485460;
+    border-radius: 3px;
+}
+
+.wg-sidebar-inner::-webkit-scrollbar-thumb:hover {
+    background: #a4b0be;
+}
+
+/* Base Hidden State (Desktop & Tablet) */
+.wg-sidebar-vertical.is-hidden {
+    margin-left: -220px;
 }
 
 .wg-main-column {
     flex-grow: 1;
-    min-width: 0; /* Prevents flex children from overflowing */
+    min-width: 0;
+    /* Prevents flex children from overflowing */
     padding: 0;
+}
+
+/* Sticky Header targeting Template Part */
+.wp-block-template-part:has(.wg-top-header) {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+/* Handle WP Admin Bar (Desktop) */
+@media screen and (min-width: 783px) {
+    body.admin-bar .wp-block-template-part:has(.wg-top-header) {
+        top: 32px;
+    }
+
+    body.admin-bar .wg-sidebar-vertical {
+        top: 92px;
+        /* 32px admin bar + 60px header */
+        height: calc(100vh - 92px);
+    }
 }
 
 .wg-top-header {
@@ -106,12 +200,11 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 20px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
 }
 
-.wg-header-left, .wg-header-center, .wg-header-right {
+.wg-header-left,
+.wg-header-center,
+.wg-header-right {
     display: flex;
     align-items: center;
     gap: 15px;
@@ -140,6 +233,7 @@
     padding: 0;
     margin: 0;
 }
+
 .wg-cat-menu li a {
     display: flex;
     align-items: center;
@@ -150,6 +244,7 @@
     transition: background 0.2s;
     gap: 10px;
 }
+
 .wg-cat-menu li a:hover {
     background: #1e272e;
     color: #0fb9b1;
@@ -197,19 +292,314 @@
     font-weight: 500;
 }
 
+/* Mini Mode: Laptop / Tablet Landscape (992px - 1599px) */
+@media (max-width: 1599px) and (min-width: 992px) {
+    .wg-sidebar-vertical {
+        width: 60px;
+    }
+
+    .wg-sidebar-inner {
+        width: 60px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        padding: 20px 10px;
+        /* Adjust padding for mini icons */
+    }
+
+    /* Hide Text gracefully */
+    .wg-sidebar-vertical .wg-cat-text {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s, visibility 0.2s;
+        white-space: nowrap;
+    }
+
+    .wg-sidebar-vertical .wg-cat-heading,
+    .wg-sidebar-vertical .wg-sidebar-copyright,
+    .wg-sidebar-vertical .wp-block-navigation {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s, visibility 0.2s;
+    }
+
+    /* Expand on Hover */
+    .wg-sidebar-vertical:hover .wg-sidebar-inner {
+        width: 220px;
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .wg-sidebar-vertical:hover .wg-cat-text,
+    .wg-sidebar-vertical:hover .wg-cat-heading {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Override hidden state for mini mode */
+    .wg-sidebar-vertical.is-hidden {
+        margin-left: -60px;
+    }
+}
+
 /* Mobile Responsive */
-@media (max-width: 768px) {
+@media (max-width: 991px) {
+    .wp-block-template-part:has(.wg-sidebar-vertical) {
+        position: static;
+        height: auto;
+    }
+
     .wg-sidebar-vertical {
         position: fixed;
         left: 0;
         z-index: 99;
-        margin-left: -250px;
+        margin-left: -220px;
+        width: 220px;
     }
+
+    .wg-sidebar-inner {
+        width: 220px;
+    }
+
     .wg-sidebar-vertical.is-mobile-open {
         margin-left: 0;
     }
+
     .wg-header-center {
-        display: none; /* Hide search on mobile or make it smaller */
+        display: none;
+        /* Hide search on mobile or make it smaller */
     }
 }
 
+/* Back to Top Button */
+.wg-btn-back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(45deg, #ff4757, #ff6b81);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease, box-shadow 0.2s ease;
+    box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
+}
+
+.wg-btn-back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.wg-btn-back-to-top:hover {
+    box-shadow: 0 5px 20px rgba(255, 71, 87, 0.6);
+    transform: translateY(-3px);
+}
+
+.wg-btn-back-to-top:active {
+    transform: translateY(0);
+}
+
+/* Mobile adjust */
+@media (max-width: 768px) {
+    .wg-btn-back-to-top {
+        bottom: 20px;
+        right: 20px;
+    }
+}
+
+/* ==========================================
+   GAME SLIDER SECTIONS
+   ========================================== */
+.wg-slider-section {
+    margin-bottom: 40px;
+    padding-bottom: 10px;
+}
+
+.wg-section-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline; /* Align bottom to look natural next to larger text */
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.wg-section-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wg-section-title .dashicons {
+    color: #ff4757;
+}
+
+.wg-view-more {
+    color: #a4b0be;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s ease;
+}
+
+.wg-view-more:hover {
+    color: #ff4757;
+}
+
+.wg-view-more .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+}
+
+/* Horizontal Scroll Container */
+.wg-game-slider {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    /* Hide by default in Firefox */
+    transition: scrollbar-color 0.3s ease;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 15px;
+    /* space for scrollbar */
+    cursor: grab;
+    user-select: none;
+    /* Prevent text selection while dragging */
+}
+
+/* Show scrollbar on hover or active (drag) in Firefox */
+.wg-game-slider:hover,
+.wg-game-slider.active {
+    scrollbar-color: #ff4757 #111418;
+}
+
+.wg-game-slider.active {
+    cursor: grabbing;
+    scroll-snap-type: none;
+    /* Disable snap for free mode */
+}
+
+/* Prevent hover conflicts while dragging */
+.wg-game-slider.active .wg-game-card {
+    pointer-events: none;
+}
+
+/* Prevent native image dragging in sliders */
+.wg-game-slider img,
+.wg-game-slider a {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+}
+
+/* Custom Scrollbar for webkit */
+.wg-game-slider::-webkit-scrollbar {
+    height: 4px;
+}
+
+/* Hide webkit scrollbar by default */
+.wg-game-slider::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+}
+
+.wg-game-slider::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 10px;
+}
+
+/* Show webkit scrollbar on hover or active (drag) */
+.wg-game-slider:hover::-webkit-scrollbar-track,
+.wg-game-slider.active::-webkit-scrollbar-track {
+    background: #111418;
+}
+
+.wg-game-slider:hover::-webkit-scrollbar-thumb,
+.wg-game-slider.active::-webkit-scrollbar-thumb {
+    background: #ff4757;
+}
+
+/* Cards inside slider */
+.wg-game-slider .wg-game-card {
+    flex: 0 0 calc((100% / 7.5) - 15px);
+    scroll-snap-align: start;
+    min-width: 120px;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1200px) {
+    .wg-game-slider .wg-game-card {
+        flex: 0 0 calc((100% / 5.5) - 15px);
+    }
+}
+
+@media (max-width: 992px) {
+    .wg-game-slider .wg-game-card {
+        flex: 0 0 calc((100% / 4.5) - 15px);
+    }
+}
+
+@media (max-width: 768px) {
+    .wg-game-slider .wg-game-card {
+        flex: 0 0 calc((100% / 3.5) - 15px);
+    }
+}
+
+@media (max-width: 480px) {
+    .wg-game-slider .wg-game-card {
+        flex: 0 0 calc((100% / 1.5) - 15px);
+    }
+}
+
+/* Slider specific hover effects (Scale image only) */
+.wg-game-slider .wg-game-card {
+    transition: none;
+    /* Disable general card transition if any */
+}
+
+.wg-game-slider .wg-game-card:hover {
+    transform: none;
+    /* Override player.css global card scale */
+    z-index: 10;
+}
+
+.wg-game-slider .wg-sidebar-thumb {
+    transition: transform 0.3s ease;
+}
+
+.wg-game-slider .wg-game-card:hover .wg-sidebar-thumb {
+    transform: scale(1.1);
+    /* Scale only the image */
+}
+
+.wg-game-slider .wg-label {
+    top: 6px;
+    left: 6px;
+}
+
+/* Ẩn các thẻ p tự sinh rỗng do wpautop của WordPress gây ra */
+.wg-sidebar-thumb-container p:empty {
+    display: none !important;
+}

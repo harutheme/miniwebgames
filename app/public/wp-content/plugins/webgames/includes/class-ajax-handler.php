@@ -13,6 +13,9 @@ class Webgames_Ajax_Handler {
 
         add_action( 'wp_ajax_webgames_report', array( $this, 'handle_report' ) );
         add_action( 'wp_ajax_nopriv_webgames_report', array( $this, 'handle_report' ) );
+
+        add_action( 'wp_ajax_webgames_track_view', array( $this, 'handle_track_view' ) );
+        add_action( 'wp_ajax_nopriv_webgames_track_view', array( $this, 'handle_track_view' ) );
     }
 
     public function handle_like() {
@@ -183,5 +186,33 @@ class Webgames_Ajax_Handler {
         } else {
             wp_send_json_error( __( 'Failed to submit report.', 'webgames' ) );
         }
+    }
+
+    public function handle_track_view() {
+        $post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+        
+        if ( ! $post_id ) {
+            wp_send_json_error( 'Missing data' );
+            wp_die();
+        }
+
+        // Rate limit views by IP to prevent spamming
+        $ip = $_SERVER['REMOTE_ADDR'];
+        $transient_key = 'wg_view_' . $post_id . '_' . md5( $ip );
+        
+        if ( ! get_transient( $transient_key ) ) {
+            $views = (int) get_post_meta( $post_id, 'wg_views', true );
+            $views++;
+            update_post_meta( $post_id, 'wg_views', $views );
+            
+            // Set a 30-minute block for the same IP viewing the same game
+            set_transient( $transient_key, true, 30 * MINUTE_IN_SECONDS );
+            
+            wp_send_json_success( array( 'views' => $views ) );
+        } else {
+            wp_send_json_success( array( 'message' => 'View already counted' ) );
+        }
+        
+        wp_die();
     }
 }

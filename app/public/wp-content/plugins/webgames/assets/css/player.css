@@ -921,3 +921,96 @@
         /* Maintain a nice banner ratio */
     }
 }
+/* All Tags Page Layout */
+.wg-all-tags-container {
+    padding: 20px 0;
+}
+.wg-tags-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(164, 176, 190, 0.2);
+}
+.wg-tags-nav a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(164, 176, 190, 0.1);
+    color: #a4b0be;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+.wg-tags-nav a:hover, body.dark-mode .wg-tags-nav a:hover {
+    background: #FF4757;
+    color: #fff;
+    transform: translateY(-2px);
+}
+.wg-tag-group {
+    margin-bottom: 40px;
+    scroll-margin-top: 80px; /* Offset for fixed headers if any */
+}
+.wg-tag-letter {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: #2f3542;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #FF4757;
+    display: inline-block;
+}
+body.dark-mode .wg-tag-letter {
+    color: #fff;
+}
+.wg-tag-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.wg-tag-grid li a {
+    display: block;
+    padding: 12px 15px;
+    background: rgba(164, 176, 190, 0.05);
+    border: 1px solid rgba(164, 176, 190, 0.1);
+    border-radius: 8px;
+    color: #2f3542;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+body.dark-mode .wg-tag-grid li a {
+    color: #f1f2f6;
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+.wg-tag-grid li a:hover {
+    background: #fff;
+    border-color: rgba(255, 71, 87, 0.3);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    color: #FF4757;
+    transform: translateY(-2px);
+}
+body.dark-mode .wg-tag-grid li a:hover {
+    background: rgba(255, 71, 87, 0.1);
+    border-color: rgba(255, 71, 87, 0.5);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.wg-tag-count {
+    color: #a4b0be;
+    font-size: 13px;
+    font-weight: normal;
+}
+.wg-tag-grid li a:hover .wg-tag-count {
+    color: #FF4757;
+}
+

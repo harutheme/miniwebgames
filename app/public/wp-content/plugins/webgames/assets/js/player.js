@@ -13,6 +13,37 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 cover.style.display = 'none';
             }, 300);
+
+            // Track View and Recently Played
+            const likeBtn = document.querySelector('.wg-btn-like');
+            const postId = likeBtn ? likeBtn.getAttribute('data-post-id') : null;
+            
+            if (postId) {
+                // 1. AJAX View Tracking
+                if (typeof webgames_ajax !== 'undefined') {
+                    jQuery.ajax({
+                        url: webgames_ajax.ajax_url,
+                        type: 'POST',
+                        data: {
+                            action: 'webgames_track_view',
+                            post_id: postId
+                        }
+                    });
+                }
+
+                // 2. Save to Recently Played (LocalStorage)
+                try {
+                    let recent = JSON.parse(localStorage.getItem('wg_recently_played')) || [];
+                    // Remove if exists to push to top
+                    recent = recent.filter(id => id !== postId);
+                    recent.unshift(postId);
+                    // Keep only last 24 games
+                    if (recent.length > 24) recent.pop();
+                    localStorage.setItem('wg_recently_played', JSON.stringify(recent));
+                } catch (e) {
+                    console.warn('LocalStorage error', e);
+                }
+            }
         });
     }
 
@@ -104,6 +135,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- 4.1 Favorites (LocalStorage) ---
+    function updateFavCount() {
+        let favorites = [];
+        try {
+            favorites = JSON.parse(localStorage.getItem('wg_favorites')) || [];
+        } catch (e) {
+            favorites = [];
+        }
+        
+        // Find all badge elements (there might be multiple headers like mobile/desktop)
+        const badges = document.querySelectorAll('.wg-fav-count');
+        badges.forEach(badge => {
+            if (favorites.length > 0) {
+                badge.innerText = favorites.length;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        });
+    }
+
+    // Initialize badge count on page load
+    updateFavCount();
+
     const favBtn = document.querySelector('.wg-btn-fav');
     if (favBtn) {
         const postId = favBtn.getAttribute('data-post-id');
@@ -151,6 +205,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             localStorage.setItem('wg_favorites', JSON.stringify(favorites));
+            
+            // Update header count globally
+            updateFavCount();
         });
     }
 
@@ -543,11 +600,42 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleBtn.addEventListener('click', function() {
             if (window.innerWidth <= 768) {
                 sidebar.classList.toggle('is-mobile-open');
+                toggleBtn.classList.toggle('is-mobile-open');
             } else {
-                sidebar.classList.toggle('is-collapsed');
+                sidebar.classList.toggle('is-hidden');
+                toggleBtn.classList.toggle('is-hidden');
             }
         });
     }
+
+    // --- 7.5 Auto-Expandable Wrapper (for FSE Templates) ---
+    const autoExpandables = document.querySelectorAll('.wg-auto-expandable');
+    autoExpandables.forEach(container => {
+        // Only wrap if it hasn't been wrapped already
+        if (!container.closest('.wg-content-section')) {
+            // Create the wrapper section
+            const wrapper = document.createElement('div');
+            wrapper.className = 'wp-block-group wg-content-section';
+            wrapper.style.marginTop = '30px';
+            wrapper.style.marginBottom = '30px';
+            
+            // Insert wrapper before the container
+            container.parentNode.insertBefore(wrapper, container);
+            
+            // Move the container inside the wrapper
+            wrapper.appendChild(container);
+            
+            // Ensure the container has the required classes
+            container.classList.add('wg-expandable-content');
+            container.classList.add('is-collapsed');
+            
+            // Create and append the Show More button
+            const btnContainer = document.createElement('div');
+            btnContainer.className = 'wg-show-more-container';
+            btnContainer.innerHTML = '<button class="wg-btn-show-more">Show More <span class="dashicons dashicons-arrow-down-alt2"></span></button>';
+            wrapper.appendChild(btnContainer);
+        }
+    });
 
     // --- 8. Expandable Content (Show More) ---
     const expandableContents = document.querySelectorAll('.wg-expandable-content');
@@ -619,4 +707,301 @@ document.addEventListener('DOMContentLoaded', function() {
         // Check again after all resources (images) have loaded
         window.addEventListener('load', checkHeight);
     });
+
+    // --- 7. Reusable LocalGame Loader (Favorites & Recently Played) ---
+    function initLocalGameLoader(containerId, storageKey, ajaxAction, emptyIcon, emptyTextKey, emptyTextFallback, isFavPage) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        let items = [];
+        try {
+            items = JSON.parse(localStorage.getItem(storageKey)) || [];
+        } catch (e) {
+            items = [];
+        }
+
+        const getEmptyText = () => {
+            return (typeof webgames_ajax !== 'undefined' && webgames_ajax.i18n && webgames_ajax.i18n[emptyTextKey]) 
+                ? webgames_ajax.i18n[emptyTextKey] 
+                : emptyTextFallback;
+        };
+
+        const renderEmpty = () => {
+            container.innerHTML = `<div class="wg-favorite-empty"><span class="dashicons dashicons-${emptyIcon}"></span><p>${getEmptyText()}</p></div>`;
+        };
+
+        if (items.length === 0) {
+            renderEmpty();
+            return;
+        }
+
+        const loadGames = (shouldScroll = false) => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentPage = urlParams.get('pg') || 1;
+            const currentSort = urlParams.get('sort') || 'default';
+            
+            // Get base URL for pagination
+            const urlObj = new URL(window.location.href);
+            urlObj.searchParams.delete('pg');
+            const baseUrl = urlObj.pathname + urlObj.search;
+            
+            // Use fade out class
+            if (!container.classList.contains('wg-skeleton-container')) {
+                container.classList.add('wg-fade-out');
+            }
+            
+            jQuery.ajax({
+                url: webgames_ajax.ajax_url,
+                type: 'POST',
+                data: {
+                    action: ajaxAction,
+                    ids: items,
+                    page: currentPage,
+                    sort: currentSort,
+                    base_url: baseUrl
+                },
+                dataType: 'json',
+                success: function(response) {
+                    container.classList.remove('wg-fade-out');
+                    if (response.success) {
+                        container.innerHTML = response.data;
+                        if (shouldScroll) {
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                    } else {
+                        if (response.data && response.data.out_of_bounds) {
+                            // Redirect to previous page using True AJAX
+                            const url = new URL(window.location.href);
+                            if (response.data.redirect_page <= 1) {
+                                url.searchParams.delete('pg');
+                            } else {
+                                url.searchParams.set('pg', response.data.redirect_page);
+                            }
+                            history.pushState(null, '', url.toString());
+                            loadGames(true);
+                        } else {
+                            // Empty state HTML from PHP
+                            container.innerHTML = response.data;
+                        }
+                    }
+                },
+                error: function() {
+                    container.classList.remove('wg-fade-out');
+                    container.innerHTML = `<div class="wg-favorite-empty"><span class="dashicons dashicons-warning"></span><p>Failed to load games. Please try again later.</p></div>`;
+                }
+            });
+        };
+
+        // Initial load
+        loadGames();
+
+        // Handle back/forward buttons
+        window.addEventListener('popstate', function() {
+            loadGames();
+        });
+
+        // Listen for remove button clicks and pagination clicks
+        container.addEventListener('click', function(e) {
+            // Pagination interception
+            const pageLink = e.target.closest('.wg-pagination a');
+            if (pageLink) {
+                e.preventDefault();
+                const url = new URL(pageLink.href);
+                history.pushState(null, '', url.toString());
+                loadGames(true);
+                return;
+            }
+
+            // Remove button interception (Only for Favorite Page)
+            if (isFavPage) {
+                const removeBtn = e.target.closest('.wg-btn-remove-fav');
+                if (removeBtn) {
+                    e.preventDefault();
+                    const removeId = removeBtn.getAttribute('data-post-id');
+                    if (removeId) {
+                        // Remove from array
+                        items = items.filter(id => id !== removeId);
+                        localStorage.setItem(storageKey, JSON.stringify(items));
+                        
+                        // Update header count globally
+                        updateFavCount();
+                        
+                        if (items.length === 0) {
+                            renderEmpty();
+                        } else {
+                            loadGames(false);
+                        }
+                    }
+                }
+            }
+        });
+
+        // Listen for sort change
+        container.addEventListener('change', function(e) {
+            if (e.target.id === 'wg-sort-select') {
+                // Prevent form submit if it's somehow bubbled
+                e.preventDefault();
+                const sortVal = e.target.value;
+                const url = new URL(window.location.href);
+                url.searchParams.set('sort', sortVal);
+                // Reset to page 1 on sort change
+                url.searchParams.delete('pg');
+                history.pushState(null, '', url.toString());
+                loadGames(true);
+            }
+        });
+
+        // Prevent the sort form from actually submitting
+        container.addEventListener('submit', function(e) {
+            if (e.target.classList.contains('wg-sort-form')) {
+                e.preventDefault();
+            }
+        });
+    }
+
+    // Initialize both pages
+    initLocalGameLoader('wg-favorite-games-container', 'wg_favorites', 'webgames_get_favorites', 'heart', 'fav_empty', 'You haven\'t favorited any games yet.', true);
+    initLocalGameLoader('wg-recently-played-container', 'wg_recently_played', 'webgames_get_recently_played', 'backup', 'recent_empty', 'You haven\'t played any games yet.', false);
+
+    // --- 9. Back to Top ---
+    const backToTopBtn = document.getElementById('wg-back-to-top');
+    if (backToTopBtn) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        });
+
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+
+    // --- 11. Drag to Scroll (Free Mode) cho Slider ---
+    function initDragToScroll(containerElement) {
+        if (!containerElement) return;
+        const sliders = containerElement.querySelectorAll ? containerElement.querySelectorAll('.wg-game-slider') : [containerElement];
+        
+        sliders.forEach(slider => {
+            // Ngăn chặn bind 2 lần
+            if (slider.dataset.dragInit) return;
+            slider.dataset.dragInit = 'true';
+
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+            let isDragging = false;
+
+            slider.addEventListener('mousedown', (e) => {
+                isDown = true;
+                isDragging = false;
+                slider.classList.add('active');
+                startX = e.pageX - slider.offsetLeft;
+                scrollLeft = slider.scrollLeft;
+            });
+
+            slider.addEventListener('mouseleave', () => {
+                isDown = false;
+                slider.classList.remove('active');
+            });
+
+            slider.addEventListener('mouseup', () => {
+                isDown = false;
+                slider.classList.remove('active');
+                
+                // Add delay before resetting isDragging to prevent phantom clicks
+                setTimeout(() => {
+                    isDragging = false;
+                }, 50);
+            });
+
+            slider.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - slider.offsetLeft;
+                const walk = (x - startX) * 1.5;
+                
+                if (Math.abs(walk) > 5) {
+                    isDragging = true;
+                }
+                
+                slider.scrollLeft = scrollLeft - walk;
+            });
+
+            slider.addEventListener('click', (e) => {
+                if (isDragging) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+            
+            // Xử lý chặn nhấp nhầm trên link con (dự phòng)
+            const links = slider.querySelectorAll('a');
+            links.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    if (isDragging) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                });
+            });
+        });
+    }
+
+    // Khởi tạo cho các slider đã có sẵn (PHP render)
+    initDragToScroll(document);
+
+    // --- 10. Homepage Recently Played Slider ---
+    const recentSliderSection = document.querySelector('.wg-recent-slider-section');
+    if (recentSliderSection) {
+        let recentGames = [];
+        try {
+            recentGames = JSON.parse(localStorage.getItem('wg_recently_played')) || [];
+        } catch (e) {
+            console.warn('LocalStorage error', e);
+        }
+
+        if (recentGames.length > 0) {
+            recentSliderSection.style.display = 'block';
+            const sliderContainer = recentSliderSection.querySelector('.wg-game-slider');
+            if (sliderContainer) {
+                const formData = new URLSearchParams();
+                formData.append('action', 'webgames_get_recently_played');
+                formData.append('layout', 'slider');
+                recentGames.forEach(id => formData.append('ids[]', id));
+
+                fetch(webgames_ajax.ajax_url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+                    body: formData.toString()
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        sliderContainer.innerHTML = data.data;
+                        // Gọi lại logic Drag cho Slider vừa render
+                        initDragToScroll(sliderContainer);
+                    } else {
+                        recentSliderSection.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching recent slider:', error);
+                    recentSliderSection.style.display = 'none';
+                });
+            }
+        }
+    }
+});
+
+
+
+// Cleanup any stray empty p tags injected by WordPress wpautop
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.wg-sidebar-thumb-container p:empty').forEach(p => p.remove());
 });

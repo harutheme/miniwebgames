@@ -9,13 +9,30 @@ class Webgames_CPT_Game {
     public function __construct() {
         add_action( 'init', array( $this, 'register_cpt' ) );
         add_action( 'init', array( $this, 'register_taxonomies' ) );
+        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 
         // Taxonomy Meta Hooks
+        add_action( 'game-category_add_form_fields', array( $this, 'add_taxonomy_custom_fields' ), 10, 1 );
+        add_action( 'game-category_edit_form_fields', array( $this, 'edit_taxonomy_custom_fields' ), 10, 2 );
+        add_action( 'created_game-category', array( $this, 'save_taxonomy_custom_fields' ), 10, 2 );
+        add_action( 'edited_game-category', array( $this, 'save_taxonomy_custom_fields' ), 10, 2 );
+
+        add_action( 'game-tag_add_form_fields', array( $this, 'add_taxonomy_custom_fields' ), 10, 1 );
+        add_action( 'game-tag_edit_form_fields', array( $this, 'edit_taxonomy_custom_fields' ), 10, 2 );
+        add_action( 'created_game-tag', array( $this, 'save_taxonomy_custom_fields' ), 10, 2 );
+        add_action( 'edited_game-tag', array( $this, 'save_taxonomy_custom_fields' ), 10, 2 );
+
         add_action( 'game-category_edit_form_fields', array( $this, 'edit_taxonomy_seo_field' ), 10, 2 );
         add_action( 'edited_game-category', array( $this, 'save_taxonomy_seo_field' ), 10, 2 );
         
         add_action( 'game-tag_edit_form_fields', array( $this, 'edit_taxonomy_seo_field' ), 10, 2 );
         add_action( 'edited_game-tag', array( $this, 'save_taxonomy_seo_field' ), 10, 2 );
+    }
+
+    public function enqueue_admin_scripts( $hook ) {
+        if ( $hook === 'edit-tags.php' || $hook === 'term.php' ) {
+            wp_enqueue_media();
+        }
     }
 
     public function register_cpt() {
@@ -142,6 +159,89 @@ class Webgames_CPT_Game {
             'show_in_rest'               => true,
         );
         register_taxonomy( 'game-tag', array( 'game' ), $tag_args );
+    }
+
+    public function add_taxonomy_custom_fields( $taxonomy ) {
+        ?>
+        <div class="form-field term-icon-class-wrap">
+            <label for="wg_category_icon_class"><?php _e( 'Icon Class', 'webgames' ); ?></label>
+            <input type="text" name="wg_category_icon_class" id="wg_category_icon_class" value="" />
+            <p class="description"><?php _e( 'Enter a Dashicon class (e.g., dashicons-car, dashicons-games). This is used if no image is uploaded.', 'webgames' ); ?></p>
+        </div>
+        <div class="form-field term-image-wrap">
+            <label for="wg_category_image"><?php _e( 'Term Image', 'webgames' ); ?></label>
+            <input type="hidden" name="wg_category_image" id="wg_category_image" value="" />
+            <div id="wg_category_image_preview" style="margin-top: 10px; margin-bottom: 10px;"></div>
+            <button class="button" id="wg_category_image_button"><?php _e( 'Upload/Select Image', 'webgames' ); ?></button>
+            <button class="button" id="wg_category_image_remove" style="display:none;"><?php _e( 'Remove Image', 'webgames' ); ?></button>
+            <?php $this->render_media_uploader_js(); ?>
+        </div>
+        <?php
+    }
+
+    public function edit_taxonomy_custom_fields( $term, $taxonomy ) {
+        $icon_class = get_term_meta( $term->term_id, 'wg_category_icon_class', true );
+        $image_id = get_term_meta( $term->term_id, 'wg_category_image', true );
+        $image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'thumbnail' ) : '';
+        ?>
+        <tr class="form-field term-icon-class-wrap">
+            <th scope="row"><label for="wg_category_icon_class"><?php _e( 'Icon Class', 'webgames' ); ?></label></th>
+            <td>
+                <input type="text" name="wg_category_icon_class" id="wg_category_icon_class" value="<?php echo esc_attr( $icon_class ); ?>" />
+                <p class="description"><?php _e( 'Enter a Dashicon class (e.g., dashicons-car, dashicons-games). This is used if no image is uploaded.', 'webgames' ); ?></p>
+            </td>
+        </tr>
+        <tr class="form-field term-image-wrap">
+            <th scope="row"><label for="wg_category_image"><?php _e( 'Term Image', 'webgames' ); ?></label></th>
+            <td>
+                <input type="hidden" name="wg_category_image" id="wg_category_image" value="<?php echo esc_attr( $image_id ); ?>" />
+                <div id="wg_category_image_preview" style="margin-top: 10px; margin-bottom: 10px;">
+                    <?php if ( $image_url ) echo '<img src="' . esc_url( $image_url ) . '" style="max-width:100px; height:auto;" />'; ?>
+                </div>
+                <button class="button" id="wg_category_image_button"><?php _e( 'Upload/Select Image', 'webgames' ); ?></button>
+                <button class="button" id="wg_category_image_remove" style="<?php echo $image_id ? '' : 'display:none;'; ?>"><?php _e( 'Remove Image', 'webgames' ); ?></button>
+                <?php $this->render_media_uploader_js(); ?>
+                <p class="description"><?php _e( 'If an image is uploaded, it will be prioritized over the Icon Class.', 'webgames' ); ?></p>
+            </td>
+        </tr>
+        <?php
+    }
+
+    private function render_media_uploader_js() {
+        ?>
+        <script>
+        jQuery(document).ready(function($){
+            var mediaUploader;
+            $('#wg_category_image_button').click(function(e) {
+                e.preventDefault();
+                if (mediaUploader) { mediaUploader.open(); return; }
+                mediaUploader = wp.media.frames.file_frame = wp.media({ title: 'Choose Image', button: { text: 'Choose Image' }, multiple: false });
+                mediaUploader.on('select', function() {
+                    var attachment = mediaUploader.state().get('selection').first().toJSON();
+                    $('#wg_category_image').val(attachment.id);
+                    $('#wg_category_image_preview').html('<img src="'+attachment.url+'" style="max-width:100px; height:auto;"/>');
+                    $('#wg_category_image_remove').show();
+                });
+                mediaUploader.open();
+            });
+            $('#wg_category_image_remove').click(function(e){
+                e.preventDefault();
+                $('#wg_category_image').val('');
+                $('#wg_category_image_preview').html('');
+                $(this).hide();
+            });
+        });
+        </script>
+        <?php
+    }
+
+    public function save_taxonomy_custom_fields( $term_id, $tt_id ) {
+        if ( isset( $_POST['wg_category_icon_class'] ) ) {
+            update_term_meta( $term_id, 'wg_category_icon_class', sanitize_text_field( $_POST['wg_category_icon_class'] ) );
+        }
+        if ( isset( $_POST['wg_category_image'] ) ) {
+            update_term_meta( $term_id, 'wg_category_image', sanitize_text_field( $_POST['wg_category_image'] ) );
+        }
     }
 
     public function edit_taxonomy_seo_field( $term, $taxonomy ) {
