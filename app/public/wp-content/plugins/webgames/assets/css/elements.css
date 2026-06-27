@@ -234,6 +234,21 @@
     margin: 0;
 }
 
+/* Thêm border mờ cho các menu trong sidebar */
+.wg-sidebar-scroll-area .wg-cat-menu {
+    border-top: 1px solid rgba(255, 255, 255, 0.08); /* Đường gạch ngang mờ */
+    margin-top: 15px;
+    padding-top: 15px;
+}
+
+/* Loại bỏ border ở menu đầu tiên (Discover menu) để không bị viền thừa ở sát trên cùng */
+.wg-sidebar-scroll-area > *:first-child,
+.wg-sidebar-scroll-area > .wg-cat-menu:first-of-type {
+    border-top: none !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
 .wg-cat-menu li a {
     display: flex;
     align-items: center;
@@ -499,9 +514,15 @@
     /* Disable snap for free mode */
 }
 
-/* Prevent hover conflicts while dragging */
-.wg-game-slider.active .wg-game-card {
-    pointer-events: none;
+/* Prevent hover conflicts while dragging without breaking click events */
+.wg-game-slider.active .wg-game-card:hover .wg-sidebar-thumb {
+    transform: none;
+}
+.wg-game-slider.active .wg-game-card:hover .wg-sidebar-thumb-container {
+    border-color: #232323;
+}
+.wg-game-slider.active .wg-game-card:hover .wg-sidebar-overlay {
+    opacity: 0;
 }
 
 /* Prevent native image dragging in sliders */
