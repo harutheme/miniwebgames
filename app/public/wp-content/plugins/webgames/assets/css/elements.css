@@ -27,21 +27,52 @@
     box-shadow: 0 0 5px rgba(46, 213, 115, 0.5);
 }
 
-/* Forms Elements */
-.wg-form-control {
-    width: 100%;
-    padding: 10px;
-    background: #1e272e;
+/* Forms Elements - Global Synchronized Styles */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
+textarea,
+select,
+.wp-block-search__input {
+    background-color: var(--m3-surface-container-high, #2B2F36);
+    color: #ffffff;
     border: 1px solid #485460;
-    color: #d2dae2;
-    border-radius: 4px;
+    border-radius: 6px;
+    padding: 10px 15px;
     font-family: inherit;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
-.wg-form-control:focus {
-    border-color: #0fb9b1;
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+input[type="url"]:focus,
+input[type="tel"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus,
+.wp-block-search__input:focus {
     outline: none;
+    border-color: var(--m3-primary, #076EFF);
+    box-shadow: 0 0 0 1px var(--m3-primary, #076EFF);
+}
+
+::placeholder {
+    color: var(--m3-on-surface-variant, #C4C7C5);
+    opacity: 1; /* Override Firefox default opacity */
+}
+
+/* Maintain backward compatibility for custom form classes */
+.wg-form-control {
+    /* Styles are now inherited from the global block above */
 }
 
 /* Buttons */
@@ -99,6 +130,25 @@
     z-index: 90;
 }
 
+/* Sidebar Overlay for Mobile */
+.wg-sidebar-overlay {
+    position: fixed;
+    top: var(--wg-header-height);
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - var(--wg-header-height));
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 98; /* Below sidebar's 99 */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.wg-sidebar-overlay.is-active {
+    opacity: 1;
+    visibility: visible;
+}
+
 .wg-sidebar-inner {
     width: 220px;
     height: 100%;
@@ -114,20 +164,35 @@
 
 .wg-sidebar-scroll-area {
     flex-grow: 1;
-    padding: 20px;
+    padding: 10px;
 }
 
 .wg-sidebar-footer {
     flex-shrink: 0;
-    padding: 20px;
-    border-top: 1px solid #1e272e;
+    padding-block-end: 30px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
     background: #111418;
     /* Ensure footer has background */
     position: relative;
     z-index: 5;
+}
+
+/* Footer navigation - horizontal link layout */
+.wg-sidebar-footer .wp-block-navigation__container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    padding: 0;
+}
+
+.wg-sidebar-footer .wp-block-navigation-item {
+    flex: 0 0 auto;
+}
+
+.wg-sidebar-footer .wp-block-navigation-item__label {
+    padding-left: 20px;
 }
 
 /* Hide footer text gracefully in mini mode */
@@ -199,14 +264,32 @@
         top: 32px;
     }
 
-    body.admin-bar .wg-sidebar-vertical {
+    body.admin-bar .wg-sidebar-vertical,
+    body.admin-bar .wg-sidebar-overlay {
         top: calc(32px + var(--wg-header-height));
         /* 32px admin bar + header */
         height: calc(100vh - (32px + var(--wg-header-height)));
     }
 }
 
+/* Handle WP Admin Bar (Mobile & Tablet Portrait) */
+@media screen and (max-width: 782px) {
+    /* Force Admin bar to be fixed to prevent layout gaps when scrolling */
+    #wpadminbar {
+        position: fixed !important;
+        top: 0 !important;
+    }
 
+    body.admin-bar .wp-block-template-part:has(.wg-top-header) {
+        top: 46px; /* Admin bar height on mobile */
+    }
+
+    body.admin-bar .wg-sidebar-vertical,
+    body.admin-bar .wg-sidebar-overlay {
+        top: calc(46px + var(--wg-header-height));
+        height: calc(100vh - (46px + var(--wg-header-height)));
+    }
+}
 
 /* Category Menu */
 .wg-cat-menu {
@@ -215,35 +298,91 @@
     margin: 0;
 }
 
-/* Thêm border mờ cho các menu trong sidebar */
-.wg-sidebar-scroll-area .wg-cat-menu {
-    border-top: 1px solid rgba(255, 255, 255, 0.08); /* Đường gạch ngang mờ */
-    margin-top: 15px;
-    padding-top: 15px;
+/* Adjust spacing for adjacent discover menus */
+ul.wg-cat-menu.wg-discover-menu {
+    margin-bottom: 0 !important;
 }
 
-/* Loại bỏ border ở menu đầu tiên (Discover menu) để không bị viền thừa ở sát trên cùng */
-.wg-sidebar-scroll-area > *:first-child,
-.wg-sidebar-scroll-area > .wg-cat-menu:first-of-type {
-    border-top: none !important;
-    margin-top: 0 !important;
-    padding-top: 0 !important;
+ul.wp-block-navigation__container.wg-cat-menu.wg-discover-menu.wp-block-navigation {
+    position: relative;
+    margin-top: 16px !important;
+    padding-top: 16px !important;
+    margin-bottom: 16px !important;
+    padding-bottom: 16px !important;
+    gap: 0 !important;
 }
 
-.wg-cat-menu li a {
+ul.wp-block-navigation__container.wg-cat-menu.wg-discover-menu.wp-block-navigation::before,
+ul.wp-block-navigation__container.wg-cat-menu.wg-discover-menu.wp-block-navigation::after {
+    content: '';
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.12);
+    /* M3 Outline Variant */
+}
+
+ul.wp-block-navigation__container.wg-cat-menu.wg-discover-menu.wp-block-navigation::before {
+    top: 0;
+}
+
+ul.wp-block-navigation__container.wg-cat-menu.wg-discover-menu.wp-block-navigation::after {
+    bottom: 0;
+}
+
+/* Ensure Gutenberg flex list items take full width */
+.wg-sidebar-vertical .wp-block-navigation-item {
+    width: 100%;
+}
+
+.wg-sidebar-vertical ul.wg-cat-menu {
+    gap: 0 !important;
+}
+
+
+.wg-sidebar-vertical .wg-cat-menu li a,
+.wg-sidebar-vertical .wp-block-navigation-item__content {
     display: flex;
     align-items: center;
     padding: 10px;
-    color: #d2dae2;
-    text-decoration: none;
-    border-radius: 4px;
-    transition: background 0.2s;
     gap: 10px;
+    color: #E6E1E5 !important;
+    /* M3 On-surface variant */
+    transition: background 0.2s, color 0.2s;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none !important;
+    width: 100%;
 }
 
-.wg-cat-menu li a:hover {
-    background: #1e272e;
-    color: #0fb9b1;
+.wg-sidebar-vertical .wg-cat-menu li a:hover,
+.wg-sidebar-vertical .wp-block-navigation-item__content:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    /* M3 State Layer */
+    color: #fff !important;
+}
+
+.wg-sidebar-vertical .wg-cat-menu li a .dashicons,
+.wg-sidebar-vertical .wp-block-navigation-item__content .dashicons {
+    color: #CAC4D0;
+    /* M3 Icon color */
+    transition: color 0.2s;
+}
+
+.wg-sidebar-vertical .wg-cat-menu li a:hover .dashicons,
+.wg-sidebar-vertical .wp-block-navigation-item__content:hover .dashicons {
+    color: #fff;
+}
+
+/* Base Headings */
+.wg-sidebar-vertical .wg-cat-heading {
+    color: #CAC4D0;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
 }
 
 /* Breadcrumbs */
@@ -299,6 +438,7 @@
 
 /* Unified Sidebar Structure (Desktop & Tablet) */
 @media (min-width: 992px) {
+
     .wg-sidebar-inner,
     .wg-sidebar-scroll-area {
         padding-left: 0 !important;
@@ -307,7 +447,7 @@
 
     .wg-cat-icon-wrapper,
     .wg-sidebar-vertical .wp-block-navigation-item .dashicons {
-        width: 64px;
+        width: 56px;
     }
 
     .wg-cat-menu li a,
@@ -319,23 +459,33 @@
         padding-left: 0 !important;
         padding-right: 16px !important;
         gap: 0 !important;
+        border-radius: 100px !important;
+        height: 42px;
+        box-sizing: border-box;
     }
 
-    .wg-sidebar-vertical .wg-cat-heading,
-    .wg-sidebar-vertical .wg-sidebar-copyright {
-        padding-left: 20px !important;
-        padding-right: 20px !important;
-    }
+
+}
+
+.wg-sidebar-vertical .wg-cat-heading,
+.wg-sidebar-vertical .wg-sidebar-copyright {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.wg-sidebar-copyright,
+.wg-sidebar-copyright .wp-block-paragraph {
+    font-size: 12px !important;
 }
 
 /* Mini Mode: Laptop / Tablet Landscape (992px - 1599px) */
 @media (max-width: 1599px) and (min-width: 992px) {
     .wg-sidebar-vertical {
-        width: 64px;
+        width: 56px;
     }
 
     .wg-sidebar-inner {
-        width: 64px;
+        width: 56px;
         position: absolute;
         left: 0;
         top: 0;
@@ -366,7 +516,7 @@
 
     .wg-sidebar-vertical:hover .wg-cat-text,
     .wg-sidebar-vertical:hover .wp-block-navigation-item__label,
-    .wg-sidebar-vertical:hover .wg-cat-heading,
+    .wg-sidebar-vertical:hover .wg-cat_heading,
     .wg-sidebar-vertical:hover .wp-block-social-links {
         opacity: 1;
         visibility: visible;
@@ -374,8 +524,27 @@
 
     /* Override hidden state for mini mode */
     .wg-sidebar-vertical.is-hidden {
-        margin-left: -64px;
+        margin-left: -56px;
     }
+}
+
+/* Global style for sidebar social links */
+.wp-block-social-link a {
+    background-color: #2f3542;
+    height: 32px;
+}
+
+.wg-sidebar-vertical .wp-block-social-links {
+    padding-left: 20px;
+    margin-block-start: 0.6rem;
+}
+
+.wp-block-social-links .wp-social-link a {
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    border-radius: 50%;
+    justify-content: center;
 }
 
 /* Mobile Responsive */
@@ -465,7 +634,8 @@
 .wg-section-header {
     display: flex;
     justify-content: flex-start;
-    align-items: baseline; /* Align bottom to look natural next to larger text */
+    align-items: baseline;
+    /* Align bottom to look natural next to larger text */
     gap: 15px;
     margin-bottom: 15px;
 }
@@ -540,9 +710,11 @@
 .wg-game-slider.active .wg-game-card:hover .wg-sidebar-thumb {
     transform: none;
 }
+
 .wg-game-slider.active .wg-game-card:hover .wg-sidebar-thumb-container {
     border-color: #232323;
 }
+
 .wg-game-slider.active .wg-game-card:hover .wg-sidebar-overlay {
     opacity: 0;
 }

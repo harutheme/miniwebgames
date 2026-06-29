@@ -279,11 +279,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Update counts
                     const likeCountSpan = document.querySelector('.wg-btn-like .wg-count-like');
                     if (likeCountSpan && data.total_like !== undefined) {
-                        likeCountSpan.innerText = data.total_like;
+                        likeCountSpan.innerText = data.total_like_formatted || data.total_like;
                     }
                     const dislikeCountSpan = document.querySelector('.wg-btn-dislike .wg-count-dislike');
                     if (dislikeCountSpan && data.total_dislike !== undefined) {
-                        dislikeCountSpan.innerText = data.total_dislike;
+                        dislikeCountSpan.innerText = data.total_dislike_formatted || data.total_dislike;
                     }
                     
                     // Update rating
@@ -593,17 +593,44 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // --- 7. Sidebar Toggle ---
+    // --- 7. Sidebar Toggle & Overlay ---
     const toggleBtn = document.getElementById('wg-toggle-sidebar');
     const sidebar = document.getElementById('wg-sidebar-vertical');
     if (toggleBtn && sidebar) {
+        // Create overlay element dynamically
+        let overlay = document.getElementById('wg-sidebar-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'wg-sidebar-overlay';
+            overlay.className = 'wg-sidebar-overlay';
+            document.body.appendChild(overlay);
+            
+            // Close sidebar when clicking overlay
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('is-mobile-open');
+                toggleBtn.classList.remove('is-mobile-open');
+                overlay.classList.remove('is-active');
+            });
+        }
+
         toggleBtn.addEventListener('click', function() {
-            if (window.innerWidth <= 768) {
+            // CSS sets mobile off-canvas behavior at <= 991px.
+            if (window.innerWidth <= 991) {
                 sidebar.classList.toggle('is-mobile-open');
                 toggleBtn.classList.toggle('is-mobile-open');
+                overlay.classList.toggle('is-active');
             } else {
                 sidebar.classList.toggle('is-hidden');
                 toggleBtn.classList.toggle('is-hidden');
+            }
+        });
+        
+        // Handle window resize to prevent overlay getting stuck on desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 991 && overlay.classList.contains('is-active')) {
+                sidebar.classList.remove('is-mobile-open');
+                toggleBtn.classList.remove('is-mobile-open');
+                overlay.classList.remove('is-active');
             }
         });
     }
@@ -999,9 +1026,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-
-
-// Cleanup any stray empty p tags injected by WordPress wpautop
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.wg-sidebar-thumb-container p:empty').forEach(p => p.remove());
-});

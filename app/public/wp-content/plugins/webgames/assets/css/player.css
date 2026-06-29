@@ -19,24 +19,78 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-size: cover;
-    background-position: center;
-    background-color: #333;
+    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2;
+    overflow: hidden;
+    background-color: #1a1c1e;
+    /* M3 surface variant */
     transition: opacity 0.3s ease;
 }
 
-.webgames-cover::before {
+.wg-cover-bg {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    background-size: cover;
+    background-position: center;
+    filter: blur(15px) brightness(0.6);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.wg-cover-bg::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.7) 100%);
+}
+
+.wg-cover-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    text-align: center;
+}
+
+.wg-cover-title {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    font-family: inherit;
+    letter-spacing: 0.5px;
+}
+
+.wg-cover-thumb-wrapper {
+    width: 200px;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+    /* Adjusted M3 shape for wider rectangle */
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    /* M3 elevation 3 */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wg-cover-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.wg-cover-play-wrap {
+    margin-top: 10px;
 }
 
 .webgames-play-btn {
@@ -186,6 +240,7 @@
     pointer-events: none;
     z-index: 100;
 }
+
 [data-tooltip]:hover::after {
     opacity: 1;
     visibility: visible;
@@ -237,7 +292,7 @@
     padding: 15px;
     border: 1px solid #2f3542;
     border-radius: 8px;
-    background: #1e272e;
+    background: var(--m3-surface-container-high);
     color: #ffffff;
     font-family: inherit;
     font-size: 14px;
@@ -248,7 +303,7 @@
 .wg-report-form textarea:focus {
     outline: none;
     border-color: #ff4757;
-    background: #2f3542;
+    background: var(--m3-surface-container-highest, #2B2F36);
 }
 
 .wg-char-count {
@@ -283,11 +338,14 @@
     cursor: not-allowed;
     transform: none;
 }
+
 /* Sidebar List */
 .webgames-sidebar-list {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
+    margin-block-start: 0 !important;
+    /* Override WP block layout flow margin */
 }
 
 .wg-sidebar-item {
@@ -333,7 +391,7 @@
     gap: 3px;
     z-index: 2;
     pointer-events: none;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .wg-game-card-rating .dashicons {
@@ -455,6 +513,31 @@
     border-radius: 8px;
     margin-top: 20px;
     margin-bottom: 20px;
+}
+
+.wg-content-section .wp-block-post-title {
+    /* Tăng title thêm ~10% so với bản trước (1.4->1.55, 1.8->2.0) */
+    font-size: clamp(1.55rem, 2.5vw + 0.5rem, 2rem) !important;
+    line-height: 1.3;
+}
+
+/* Thu nhỏ nội dung bài viết cho phù hợp với Title */
+.wg-content-section .wp-block-post-content,
+.wg-content-section .wp-block-post-content p,
+.wg-content-section .wp-block-post-content li {
+    font-size: clamp(0.8rem, 1.5vw + 0.4rem, 0.9rem) !important;
+    line-height: 1.6;
+    color: var(--wg-text-muted); /* Áp dụng màu xanh xám dịu mắt */
+}
+
+/* Đảm bảo các thẻ tiêu đề bên trong nội dung vẫn sáng để tạo phân cấp */
+.wg-content-section .wp-block-post-content h1,
+.wg-content-section .wp-block-post-content h2,
+.wg-content-section .wp-block-post-content h3,
+.wg-content-section .wp-block-post-content h4,
+.wg-content-section .wp-block-post-content h5,
+.wg-content-section .wp-block-post-content h6 {
+    color: #ffffff;
 }
 
 /* Expandable Content */
@@ -637,7 +720,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(2px);
     z-index: 10000;
     opacity: 0;
@@ -662,7 +745,7 @@
     z-index: 10001;
     transform: translateX(100%);
     transition: transform 0.35s ease-out;
-    box-shadow: -5px 0 25px rgba(0,0,0,0.5);
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
 }
@@ -676,7 +759,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 25px 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .wg-share-header h3 {
@@ -705,7 +788,7 @@
     padding: 15px;
     border: none;
     border-radius: 8px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
     color: #fff;
     font-size: 15px;
     font-weight: 500;
@@ -715,7 +798,7 @@
 }
 
 .wg-share-btn:hover {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
     transform: translateY(-2px);
 }
 
@@ -726,14 +809,35 @@
     height: 20px;
 }
 
-.wg-share-fb:hover { background: #1877F2; }
-.wg-share-x:hover { background: #000000; border: 1px solid #333; }
-.wg-share-instagram:hover { background: #E1306C; }
-.wg-share-tiktok:hover { background: #000000; border: 1px solid #333; }
-.wg-share-copy:hover { background: #ff4757; }
+.wg-share-fb:hover {
+    background: #1877F2;
+}
 
-.wg-share-native { display: none; }
-.wg-share-native:hover { background: #2ed573; }
+.wg-share-x:hover {
+    background: #000000;
+    border: 1px solid #333;
+}
+
+.wg-share-instagram:hover {
+    background: #E1306C;
+}
+
+.wg-share-tiktok:hover {
+    background: #000000;
+    border: 1px solid #333;
+}
+
+.wg-share-copy:hover {
+    background: #ff4757;
+}
+
+.wg-share-native {
+    display: none;
+}
+
+.wg-share-native:hover {
+    background: #2ed573;
+}
 
 /* ==========================================
    WOOCOMMERCE STYLE TOAST NOTIFICATIONS
@@ -746,7 +850,8 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
-    pointer-events: none; /* Let clicks pass through the container */
+    pointer-events: none;
+    /* Let clicks pass through the container */
 }
 
 .wg-woo-toast {
@@ -754,9 +859,10 @@
     align-items: stretch;
     background-color: #ffffff;
     border-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     overflow: hidden;
-    pointer-events: auto; /* Re-enable clicks on the toast itself */
+    pointer-events: auto;
+    /* Re-enable clicks on the toast itself */
     transform: translateY(100px) scale(0.9);
     opacity: 0;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -886,10 +992,10 @@
     transform: scale(1.1);
 }
 
-.wg-btn-exit-fullscreen .dashicons {
-    font-size: 24px;
+.wg-btn-exit-fullscreen svg {
     width: 24px;
     height: 24px;
+    fill: #ffffff;
 }
 
 .webgames-canvas-container:fullscreen {
@@ -921,10 +1027,12 @@
         /* Maintain a nice banner ratio */
     }
 }
+
 /* All Tags Page Layout */
 .wg-all-tags-container {
     padding: 20px 0;
 }
+
 .wg-tags-nav {
     display: flex;
     flex-wrap: wrap;
@@ -933,6 +1041,7 @@
     padding-bottom: 20px;
     border-bottom: 1px solid rgba(164, 176, 190, 0.2);
 }
+
 .wg-tags-nav a {
     display: inline-flex;
     align-items: center;
@@ -946,15 +1055,20 @@
     font-weight: bold;
     transition: all 0.2s ease;
 }
-.wg-tags-nav a:hover, body.dark-mode .wg-tags-nav a:hover {
+
+.wg-tags-nav a:hover,
+body.dark-mode .wg-tags-nav a:hover {
     background: #FF4757;
     color: #fff;
     transform: translateY(-2px);
 }
+
 .wg-tag-group {
     margin-bottom: 40px;
-    scroll-margin-top: 80px; /* Offset for fixed headers if any */
+    scroll-margin-top: 80px;
+    /* Offset for fixed headers if any */
 }
+
 .wg-tag-letter {
     font-size: 24px;
     margin-bottom: 15px;
@@ -963,9 +1077,11 @@
     border-bottom: 2px solid #FF4757;
     display: inline-block;
 }
+
 body.dark-mode .wg-tag-letter {
     color: #fff;
 }
+
 .wg-tag-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -974,6 +1090,7 @@ body.dark-mode .wg-tag-letter {
     padding: 0;
     margin: 0;
 }
+
 .wg-tag-grid li a {
     display: block;
     padding: 12px 15px;
@@ -988,29 +1105,33 @@ body.dark-mode .wg-tag-letter {
     justify-content: space-between;
     align-items: center;
 }
+
 body.dark-mode .wg-tag-grid li a {
     color: #f1f2f6;
     background: rgba(255, 255, 255, 0.03);
     border-color: rgba(255, 255, 255, 0.05);
 }
+
 .wg-tag-grid li a:hover {
     background: #fff;
     border-color: rgba(255, 71, 87, 0.3);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     color: #FF4757;
     transform: translateY(-2px);
 }
+
 body.dark-mode .wg-tag-grid li a:hover {
     background: rgba(255, 71, 87, 0.1);
     border-color: rgba(255, 71, 87, 0.5);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
+
 .wg-tag-count {
     color: #a4b0be;
     font-size: 13px;
     font-weight: normal;
 }
+
 .wg-tag-grid li a:hover .wg-tag-count {
     color: #FF4757;
 }
-

@@ -229,3 +229,14 @@ add_filter( 'render_block_core/site-title', function( $block_content, $block ) {
     return $block_content;
 }, 10, 2 );
 
+// Gỡ bỏ wpautop trên toàn bộ site để ngăn chặn việc WordPress tự sinh thẻ <p> rác
+add_action( 'init', 'webgames_disable_wpautop_globally', 10 );
+function webgames_disable_wpautop_globally() {
+    // Gỡ bỏ wpautop khỏi tất cả các bộ lọc cốt lõi
+    remove_filter( 'the_content', 'wpautop' );
+    remove_filter( 'the_excerpt', 'wpautop' );
+    remove_filter( 'widget_text_content', 'wpautop' );
+    
+    // Đảm bảo Gutenberg không cố gắng wpautop các block cổ điển
+    remove_filter( 'render_block_core/freeform', 'wpautop' );
+}

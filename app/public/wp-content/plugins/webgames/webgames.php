@@ -31,6 +31,13 @@ require_once WEBGAMES_PLUGIN_DIR . 'includes/class-ajax-handler.php';
 require_once WEBGAMES_PLUGIN_DIR . 'includes/class-comment-spam.php';
 require_once WEBGAMES_PLUGIN_DIR . 'includes/class-social-login.php';
 require_once WEBGAMES_PLUGIN_DIR . 'includes/class-shortcodes.php';
+require_once WEBGAMES_PLUGIN_DIR . 'includes/helpers.php';
+
+// Disable automatic wpautop globally – removes auto‑generated <p> tags site‑wide
+add_action( 'init', function() {
+    remove_filter( 'the_content', 'wpautop' );
+    remove_filter( 'the_excerpt', 'wpautop' );
+} );
 
 // Initialize classes
 new Webgames_Social_Login();

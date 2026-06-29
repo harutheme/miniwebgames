@@ -8,6 +8,7 @@
     --m3-primary: #076EFF;
     --m3-error: #FF4C4C;
     --wg-header-height: 64px;
+    --wg-text-muted: #bed1e3;
 }
 
 /* Base Header */
@@ -276,9 +277,18 @@
         display: flex;
         /* Show search toggle icon */
     }
+}
 
-    .wg-btn-toggle-sidebar.is-mobile-open .wg-sidebar-toggle-svg {
+/* Mobile Sidebar Toggle Icon Logic (Matches 991px breakpoint) */
+@media (max-width: 991px) {
+    /* Mặc định trên Mobile, sidebar ĐÓNG, nên icon phải hướng sang PHẢI (để ám chỉ mở) */
+    .wg-btn-toggle-sidebar .wg-sidebar-toggle-svg {
         transform: rotateY(180deg);
+    }
+    
+    /* Khi sidebar MỞ trên Mobile (.is-mobile-open), icon phải hướng sang TRÁI (để ám chỉ đóng) */
+    .wg-btn-toggle-sidebar.is-mobile-open .wg-sidebar-toggle-svg {
+        transform: rotateY(0deg);
     }
 }
 

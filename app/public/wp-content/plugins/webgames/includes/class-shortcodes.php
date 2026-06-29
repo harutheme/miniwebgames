@@ -38,20 +38,42 @@ class Webgames_Shortcodes {
 
         // Dynamic swap for game search
         add_filter( 'render_block', array( $this, 'swap_search_blocks' ), 10, 2 );
+
+        // Global minification for all webgames shortcodes to prevent wpautop issues
+        add_filter( 'do_shortcode_tag', array( $this, 'minify_shortcode_output' ), 99, 2 );
+    }
+
+    /**
+     * Globally strip HTML comments and newlines from all webgames shortcodes
+     * to prevent WordPress wpautop from injecting empty <p> tags.
+     */
+    public function minify_shortcode_output( $output, $tag = '' ) {
+        if ( empty( $tag ) || strpos( $tag, 'webgames_' ) === 0 ) {
+            // Xóa HTML comments
+            $output = preg_replace('/<!--(.|\s)*?-->/', '', $output);
+            // Xóa toàn bộ dấu xuống dòng và ký tự tab
+            $output = str_replace( array( "\r", "\n", "\t" ), '', $output );
+            // Xóa các khoảng trắng thừa (indentation) từ 2 khoảng trắng trở lên giữa các thẻ HTML
+            $output = preg_replace('/>\s{2,}</', '><', $output);
+        }
+        return $output;
     }
 
     public function swap_search_blocks( $block_content, $block ) {
-        if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game' ) {
-            if ( $block['blockName'] === 'core/query' ) {
+        if ( is_admin() ) {
+    return $block_content;
+}
+if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game' ) {
+    if ( $block['blockName'] === 'core/query' ) {
                 static $rendered = false;
                 if ( ! $rendered ) {
                     $rendered = true;
                     // Add Top Ad before the grid
-                    $ad_html = '<div class="wp-block-group" style="margin-top:20px;margin-bottom:20px;text-align:center;">
-                        <div class="wg-top-ad-placeholder" style="background: #2f3542; color: #fff; border-radius: 8px; padding: 20px; width: 100%; max-width: 728px; margin: 0 auto; display: flex; align-items: center; justify-content: center; min-height: 90px;">
-                            Top Leaderboard Ad (728x90)
-                        </div>
-                    </div>';
+                    $ad_html = '<div class="wg-ad-container" style="margin-top:20px;margin-bottom:20px;">'
+    . '<div class="wg-top-ad-placeholder" style="background: #2f3542; color: #fff; border-radius: 8px; padding: 20px; width: 100%; max-width: 728px; margin: 0 auto; display: flex; align-items: center; justify-content: center; min-height: 90px;">'
+    . 'Top Leaderboard Ad (728x90)'
+    . '</div>'
+    . '</div>';
                     return $ad_html . do_shortcode( '[webgames_archive_content]' );
                 }
                 return ''; // If multiple queries exist, hide them
@@ -150,48 +172,63 @@ class Webgames_Shortcodes {
         <div class="webgames-player-wrapper" id="webgames-player-wrapper">
             <!-- Game Canvas / Iframe Area -->
             <div class="webgames-canvas-container" id="webgames-canvas-container">
-                <button class="wg-btn-exit-fullscreen" id="wg-btn-exit-fullscreen" style="display: none;" title="<?php _e('Exit Fullscreen', 'webgames'); ?>">
-                    <span class="dashicons dashicons-editor-contract"></span>
-                </button>
-                <div class="webgames-cover" id="webgames-cover" style="background-image: url('<?php echo esc_url( $cover_url ); ?>');">
-                    <button class="webgames-play-btn" id="webgames-play-btn" data-src="<?php echo esc_url( $game_url ); ?>">
-                        <span class="dashicons dashicons-controls-play"></span> <?php _e( 'PLAY NOW', 'webgames' ); ?>
+                <div class="wg-btn-exit-wrapper">
+                    <button class="wg-btn-exit-fullscreen" id="wg-btn-exit-fullscreen" style="display: none;" title="<?php _e('Exit Fullscreen', 'webgames'); ?>">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
                     </button>
                 </div>
-                <iframe id="webgames-iframe" class="webgames-iframe" src="" frameborder="0" scrolling="no" allowfullscreen></iframe>
+                <div class="webgames-cover" id="webgames-cover">
+                    <div class="wg-cover-bg" style="background-image: url('<?php echo esc_url( $cover_url ); ?>');"></div>
+                    <div class="wg-cover-content">
+                        <h2 class="wg-cover-title"><?php echo esc_html( $title ); ?></h2>
+                        <?php if ( ! empty( $thumb_url ) ) : ?>
+                            <div class="wg-cover-thumb-wrapper">
+                                <img src="<?php echo esc_url( $thumb_url ); ?>" alt="<?php echo esc_attr( $title ); ?>" class="wg-cover-thumb" />
+                            </div>
+                        <?php endif; ?>
+                        <div class="wg-cover-play-wrap">
+                            <button class="webgames-play-btn" id="webgames-play-btn" data-src="<?php echo esc_url( $game_url ); ?>">
+                                <span class="dashicons dashicons-controls-play"></span> <?php _e( 'PLAY NOW', 'webgames' ); ?>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="wg-iframe-wrapper">
+                    <iframe id="webgames-iframe" class="webgames-iframe" src="" frameborder="0" scrolling="no" allowfullscreen></iframe>
+                </div>
             </div>
 
-            <!-- Toolbar Area -->
-            <div class="webgames-toolbar">
-                <div class="wg-toolbar-left">
-                    <div class="wg-thumb-container" style="position:relative;">
-                        <?php if ( ! empty( $thumb_url ) ) : ?>
-                            <img src="<?php echo esc_url( $thumb_url ); ?>" alt="thumbnail" class="wg-thumb" />
-                        <?php endif; ?>
-                        <?php echo $label_html; ?>
+                <!-- Toolbar Area -->
+                <div class="webgames-toolbar">
+                    <div class="wg-toolbar-left">
+                        <div class="wg-thumb-container" style="position:relative;">
+                            <?php if ( ! empty( $thumb_url ) ) : ?>
+                                <img src="<?php echo esc_url( $thumb_url ); ?>" alt="thumbnail" class="wg-thumb" />
+                            <?php endif; ?>
+                            <?php echo $label_html; ?>
+                        </div>
+                        <div class="wg-title"><?php echo esc_html( $title ); ?></div>
                     </div>
-                    <span class="wg-title"><?php echo esc_html( $title ); ?></span>
-                </div>
-                <div class="wg-toolbar-right">
-                    <button class="wg-btn wg-btn-like" data-post-id="<?php echo esc_attr( $post_id ); ?>" data-tooltip="<?php _e('Like', 'webgames'); ?>">
-                        <span class="dashicons dashicons-thumbs-up"></span> <span class="wg-count-like"><?php echo esc_html( $total_like ); ?></span>
-                    </button>
-                    <button class="wg-btn wg-btn-dislike" data-post-id="<?php echo esc_attr( $post_id ); ?>" data-tooltip="<?php _e('Dislike', 'webgames'); ?>">
-                        <span class="dashicons dashicons-thumbs-down"></span> <span class="wg-count-dislike"><?php echo esc_html( $total_dislike ); ?></span>
-                    </button>
-                    <button class="wg-btn wg-btn-fav" data-post-id="<?php echo esc_attr( $post_id ); ?>" data-game-title="<?php echo esc_attr( $title ); ?>" data-game-thumb="<?php echo esc_url( $thumb_url ); ?>" data-tooltip="<?php _e('Favorite', 'webgames'); ?>">
-                        <span class="dashicons dashicons-heart"></span>
-                    </button>
-                    <button class="wg-btn wg-btn-share" id="wg-btn-share" data-game-title="<?php echo esc_attr( $title ); ?>" data-game-url="<?php echo esc_url( get_permalink( $post_id ) ); ?>" data-tooltip="<?php _e('Share', 'webgames'); ?>">
-                        <span class="dashicons dashicons-share"></span>
-                    </button>
-                    <button class="wg-btn wg-btn-report" id="wg-btn-report" data-tooltip="<?php _e('Report', 'webgames'); ?>">
-                        <span class="dashicons dashicons-flag"></span>
-                    </button>
-                    <button class="wg-btn wg-btn-fullscreen" id="wg-btn-fullscreen" data-tooltip="<?php _e('Fullscreen', 'webgames'); ?>">
-                        <span class="dashicons dashicons-editor-expand"></span>
-                    </button>
-                </div>
+                    <div class="wg-toolbar-right">
+                        <button class="wg-btn wg-btn-like" data-post-id="<?php echo esc_attr( $post_id ); ?>" data-tooltip="<?php _e('Like', 'webgames'); ?>">
+                            <span class="dashicons dashicons-thumbs-up"></span> <span class="wg-count-like"><?php echo esc_html( webgames_format_number( $total_like ) ); ?></span>
+                        </button>
+                        <button class="wg-btn wg-btn-dislike" data-post-id="<?php echo esc_attr( $post_id ); ?>" data-tooltip="<?php _e('Dislike', 'webgames'); ?>">
+                            <span class="dashicons dashicons-thumbs-down"></span> <span class="wg-count-dislike"><?php echo esc_html( webgames_format_number( $total_dislike ) ); ?></span>
+                        </button>
+                        <button class="wg-btn wg-btn-fav" data-post-id="<?php echo esc_attr( $post_id ); ?>" data-game-title="<?php echo esc_attr( $title ); ?>" data-game-thumb="<?php echo esc_url( $thumb_url ); ?>" data-tooltip="<?php _e('Favorite', 'webgames'); ?>">
+                            <span class="dashicons dashicons-heart"></span>
+                        </button>
+                        <button class="wg-btn wg-btn-share" id="wg-btn-share" data-game-title="<?php echo esc_attr( $title ); ?>" data-game-url="<?php echo esc_url( get_permalink( $post_id ) ); ?>" data-tooltip="<?php _e('Share', 'webgames'); ?>">
+                            <span class="dashicons dashicons-share"></span>
+                        </button>
+                        <button class="wg-btn wg-btn-report" id="wg-btn-report" data-tooltip="<?php _e('Report', 'webgames'); ?>">
+                            <span class="dashicons dashicons-flag"></span>
+                        </button>
+                        <button class="wg-btn wg-btn-fullscreen" id="wg-btn-fullscreen" data-tooltip="<?php _e('Fullscreen', 'webgames'); ?>">
+                            <span class="dashicons dashicons-editor-expand"></span>
+                        </button>
+                    </div>
             </div>
 
             <!-- Share Off-Canvas Sidebar -->
@@ -237,9 +274,11 @@ class Webgames_Shortcodes {
             <div id="wg-report-sidebar" class="wg-share-sidebar">
                 <div class="wg-share-header">
                     <h3><?php _e('Report Game Issue', 'webgames'); ?></h3>
-                    <button id="wg-report-close" class="wg-btn wg-btn-close">
-                        <span class="dashicons dashicons-no-alt"></span>
-                    </button>
+                    <div class="wg-close-wrapper">
+                        <button id="wg-report-close" class="wg-btn wg-btn-close">
+                            <span class="dashicons dashicons-no-alt"></span>
+                        </button>
+                    </div>
                 </div>
                 <div class="wg-share-body wg-report-body">
                     <form id="wg-report-form" class="wg-report-form">
@@ -262,7 +301,12 @@ class Webgames_Shortcodes {
             </div>
         </div>
         <?php
-        return ob_get_clean();
+        $player_html = ob_get_clean();
+        
+        // Guarantee minification by calling it directly, bypassing any do_shortcode_tag FSE bugs
+        $player_html = $this->minify_shortcode_output( $player_html, 'webgames_player' );
+        
+        return $player_html;
     }
 
     public function render_sidebar_list( $atts ) {
@@ -1464,7 +1508,8 @@ class Webgames_Shortcodes {
             </li>
         </ul>
         <?php
-        return ob_get_clean();
+        $html = ob_get_clean();
+        return str_replace( array( "\r\n", "\r", "\n", "\t" ), '', $html );
     }
 
     /**

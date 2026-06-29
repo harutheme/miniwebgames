@@ -107,6 +107,8 @@ class Webgames_Ajax_Handler {
         wp_send_json_success( array( 
             'total_like' => $total_like,
             'total_dislike' => $total_dislike,
+            'total_like_formatted' => webgames_format_number( $total_like ),
+            'total_dislike_formatted' => webgames_format_number( $total_dislike ),
             'rating' => $rating,
             'action_result' => $is_unvote ? 'unvoted' : $action_type
         ) );

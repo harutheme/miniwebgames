@@ -14,45 +14,38 @@
             <!-- wp:columns {"align":"wide"} -->
             <div class="wp-block-columns alignwide">
                 
-                <!-- Left Column: Main Content -->
                 <!-- wp:column -->
                 <div class="wp-block-column">
 
-                    <!-- Player Shortcode -->
                     <!-- wp:shortcode -->
                     [webgames_player]
                     <!-- /wp:shortcode -->
 
-                    <!-- Ad Under Player -->
                     <!-- wp:shortcode -->
                     [webgames_under_player_ad]
                     <!-- /wp:shortcode -->
                     
-                    <!-- Related Games Grid -->
                     <!-- wp:shortcode -->
                     [webgames_related_grid posts_per_page="8"]
                     <!-- /wp:shortcode -->
                     
                     <!-- wp:group {"className":"wg-content-section","layout":{"type":"constrained"}} -->
                     <div class="wp-block-group wg-content-section">
-                        <!-- Breadcrumbs -->
                         <!-- wp:shortcode -->
                         [webgames_breadcrumbs]
                         <!-- /wp:shortcode -->
 
                         <!-- wp:post-title {"level":1,"style":{"spacing":{"margin":{"bottom":"10px","top":"0px"}}}} /-->
                         
-                        <!-- Game Rating -->
                         <!-- wp:shortcode -->
                         [webgames_rating]
                         <!-- /wp:shortcode -->
                         
-                        <!-- Categories -->
                         <!-- wp:post-terms {"term":"game-category","separator":" \u00b7 ","className":"is-style-default"} /-->
 
-                        <!-- wp:separator {"className":"is-style-wide"} -->
-                        <hr class="wp-block-separator has-alpha-channel-opacity is-style-wide" style="background-color:rgba(255, 255, 255, 0.08); margin-top:15px; margin-bottom:20px; border:none; height:1px;"/>
-                        <!-- /wp:separator -->
+                        <!-- wp:html -->
+                        <hr class="wg-custom-separator" style="background-color:rgba(255, 255, 255, 0.08); margin-top:15px; margin-bottom:20px; border:none; height:1px;"/>
+                        <!-- /wp:html -->
 
                         <!-- wp:group {"className":"wg-expandable-content is-collapsed","layout":{"type":"constrained"}} -->
                         <div class="wp-block-group wg-expandable-content is-collapsed">
@@ -76,21 +69,18 @@
 
                     <!-- wp:group {"className":"wg-content-section","layout":{"type":"constrained"}} -->
                     <div class="wp-block-group wg-content-section">
-                        <!-- Comments -->
                         <!-- wp:pattern {"slug":"webgames/comments"} /-->
                     </div>
                     <!-- /wp:group -->
                 </div>
                 <!-- /wp:column -->
 
-                <!-- Right Column: Sidebar (325px) -->
                 <!-- wp:column {"width":"325px"} -->
                 <div class="wp-block-column" style="flex-basis:325px">
                     <!-- wp:heading {"level":3,"className":"screen-reader-text"} -->
                     <h3 class="wp-block-heading screen-reader-text">Related Games</h3>
                     <!-- /wp:heading -->
 
-                    <!-- Sidebar List Shortcode with Interleaved Ads -->
                     <!-- wp:shortcode -->
                     [webgames_sidebar_list posts_per_page="10" ad_after="4"]
                     <!-- /wp:shortcode -->
