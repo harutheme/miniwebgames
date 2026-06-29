@@ -1,48 +1,27 @@
 <!-- wp:group {"tagName":"header","className":"wg-top-header","layout":{"type":"default"}} -->
 <header class="wp-block-group wg-top-header">
-    <div class="wg-header-left">
-        <style>
-            .wg-btn-toggle-sidebar {
-                background: transparent;
-                border: none;
-                cursor: pointer;
-                padding: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .wg-sidebar-toggle-svg {
-                width: 42px;
-                height: 42px;
-                fill: #253E61;
-                transition: transform 0.3s ease, fill 0.3s ease;
-            }
-            .wg-btn-toggle-sidebar:hover .wg-sidebar-toggle-svg {
-                fill: #076EFF;
-            }
-            .wg-btn-toggle-sidebar.is-hidden .wg-sidebar-toggle-svg {
-                transform: rotateY(180deg);
-            }
-            @media (max-width: 768px) {
-                .wg-btn-toggle-sidebar.is-mobile-open .wg-sidebar-toggle-svg {
-                    transform: rotateY(180deg);
-                }
-            }
-        </style>
-        <button id="wg-toggle-sidebar" class="wg-btn-toggle-sidebar">
+    
+    <!-- wp:group {"className":"wg-header-left","layout":{"type":"flex","flexWrap":"nowrap"}} -->
+    <div class="wp-block-group wg-header-left">
+        <!-- wp:html -->
+        <button id="wg-toggle-sidebar" class="wg-icon-button wg-btn-toggle-sidebar">
             <svg viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg" class="wg-sidebar-toggle-svg">
                 <path d="M140.001-260.001v-45.384h488.46v45.384h-488.46Zm647.998-47L613.616-480.615l173.768-172.999L819.999-621 678.845-480.615l141.769 140.999-32.615 32.615ZM140.001-458.924v-45.383h371.537v45.383H140.001Zm0-195.691v-45.384h488.46v45.384h-488.46Z" stroke-linecap="round"></path>
             </svg>
         </button>
+        <!-- /wp:html -->
+        
         <!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->
-        <div class="wp-block-group" style="display:flex; align-items:center; gap:10px;">
+        <div class="wp-block-group">
             <!-- wp:site-logo {"width":120} /-->
             <!-- wp:site-title {"level":0,"style":{"typography":{"fontSize":"20px","fontWeight":"700"},"elements":{"link":{"color":{"text":"#ffffff"}}}}} /-->
         </div>
         <!-- /wp:group -->
     </div>
+    <!-- /wp:group -->
     
-    <div class="wg-header-center">
+    <!-- wp:group {"className":"wg-header-center","layout":{"type":"default"}} -->
+    <div class="wp-block-group wg-header-center">
         <!-- wp:html -->
         <form role="search" method="get" action="/" class="wp-block-search__button-outside wp-block-search__icon-button wp-block-search" style="width: 100%;">
             <label class="wp-block-search__label screen-reader-text">Search</label>
@@ -54,27 +33,83 @@
                 </button>
             </div>
         </form>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var urlParams = new URLSearchParams(window.location.search);
-                var q = urlParams.get('s');
-                if (q) {
-                    var inputs = document.querySelectorAll('.wg-header-search-input');
-                    inputs.forEach(function(input) { input.value = q; });
-                }
-            });
-        </script>
         <!-- /wp:html -->
     </div>
+    <!-- /wp:group -->
     
-    <div class="wg-header-right">
-        <a href="/favorite-games/" title="Favorites" style="color: #fff; font-size: 20px; text-decoration: none; position: relative; margin-right: 15px;">
+    <!-- wp:group {"className":"wg-header-right","layout":{"type":"flex","flexWrap":"nowrap"}} -->
+    <div class="wp-block-group wg-header-right">
+        <!-- wp:html -->
+        <!-- Mobile search toggle -->
+        <button id="wg-mobile-search-btn" class="wg-icon-button wg-mobile-search-toggle" aria-label="Toggle Search">
+            <svg class="search-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M13 5c-3.3 0-6 2.7-6 6 0 1.4.5 2.7 1.3 3.7l-3.8 3.8 1.1 1.1 3.8-3.8c1 .8 2.3 1.3 3.7 1.3 3.3 0 6-2.7 6-6S16.3 5 13 5zm0 10.5c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5 4.5 2 4.5 4.5-2 4.5-4.5 4.5z"></path></svg>
+        </button>
+        <!-- /wp:html -->
+
+        <!-- wp:html -->
+        <a href="/favorite-games/" title="Favorites" class="wg-icon-button wg-fav-button-wrapper">
             <span class="dashicons dashicons-heart"></span>
-            <span class="wg-fav-count" style="display:none; position: absolute; top: -8px; right: -10px; background: #ff4757; color: white; font-size: 11px; font-weight: bold; padding: 2px 5px; border-radius: 10px; line-height: 1;">0</span>
+            <span class="wg-fav-count" style="display:none;">0</span>
         </a>
-        <!-- wp:shortcode -->
-        [webgames_header_user]
-        <!-- /wp:shortcode -->
+        <!-- /wp:html -->
+        
+        <!-- wp:group {"className":"wg-header-user-wrapper","layout":{"type":"default"}} -->
+        <div class="wp-block-group wg-header-user-wrapper">
+            <!-- wp:shortcode -->
+            [webgames_header_user]
+            <!-- /wp:shortcode -->
+        </div>
+        <!-- /wp:group -->
     </div>
+    <!-- /wp:group -->
+
+    <!-- wp:html -->
+    <!-- Mobile Search Overlay -->
+    <div id="wg-mobile-search-overlay" class="wg-mobile-search-overlay">
+        <form role="search" method="get" action="/" class="wp-block-search__button-outside wp-block-search__icon-button wp-block-search">
+            <label class="wp-block-search__label screen-reader-text">Search</label>
+            <div class="wp-block-search__inside-wrapper">
+                <input type="search" class="wp-block-search__input wg-header-search-input" name="s" placeholder="Search games..." required="">
+                <input type="hidden" name="post_type" value="game">
+                <button type="submit" class="wp-block-search__button has-icon" aria-label="Search">
+                    <svg class="search-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M13 5c-3.3 0-6 2.7-6 6 0 1.4.5 2.7 1.3 3.7l-3.8 3.8 1.1 1.1 3.8-3.8c1 .8 2.3 1.3 3.7 1.3 3.3 0 6-2.7 6-6S16.3 5 13 5zm0 10.5c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5 4.5 2 4.5 4.5-2 4.5-4.5 4.5z"></path></svg>
+                </button>
+            </div>
+        </form>
+        <button id="wg-close-mobile-search" class="wg-icon-button wg-mobile-search-close" aria-label="Close Search">
+            <span class="dashicons dashicons-no-alt"></span>
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var q = urlParams.get('s');
+            if (q) {
+                var inputs = document.querySelectorAll('.wg-header-search-input');
+                inputs.forEach(function(input) { input.value = q; });
+            }
+
+            // Mobile search overlay toggle
+            var mobileSearchBtn = document.getElementById('wg-mobile-search-btn');
+            var closeSearchBtn = document.getElementById('wg-close-mobile-search');
+            var searchOverlay = document.getElementById('wg-mobile-search-overlay');
+
+            if (mobileSearchBtn && searchOverlay) {
+                mobileSearchBtn.addEventListener('click', function() {
+                    searchOverlay.classList.add('is-active');
+                    var input = searchOverlay.querySelector('input[type="search"]');
+                    if(input) input.focus();
+                });
+            }
+
+            if (closeSearchBtn && searchOverlay) {
+                closeSearchBtn.addEventListener('click', function() {
+                    searchOverlay.classList.remove('is-active');
+                });
+            }
+        });
+    </script>
+    <!-- /wp:html -->
 </header>
 <!-- /wp:group -->

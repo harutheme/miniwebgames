@@ -1,0 +1,489 @@
+/* M3 Top App Bar Variables */
+:root {
+    --m3-surface: #111418;
+    --m3-surface-container: #1D2024;
+    --m3-surface-container-high: #2B2F36;
+    --m3-on-surface: #FFFFFF;
+    --m3-on-surface-variant: #C4C7C5;
+    --m3-primary: #076EFF;
+    --m3-error: #FF4C4C;
+    --wg-header-height: 64px;
+}
+
+/* Base Header */
+.wg-top-header {
+    height: var(--wg-header-height);
+    /* M3 Small Top App Bar */
+    background: var(--m3-surface);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    /* M3 standard padding */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    /* M3 Elevation */
+    position: relative;
+    z-index: 100;
+}
+
+/* Layout Groups */
+.wg-header-left,
+.wg-header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Reset Gutenberg default block gaps that break flex centering */
+.wg-top-header>*,
+.wg-header-left>*,
+.wg-header-center>*,
+.wg-header-right>* {
+    margin-block-start: 0 !important;
+    margin-block-end: 0 !important;
+}
+
+.wg-header-center {
+    flex-grow: 1;
+    max-width: 720px;
+    margin: 0 24px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Typography (Site Title) */
+.wg-top-header .wp-block-site-title a {
+    font-size: 22px !important;
+    /* M3 Title Large */
+    font-weight: 500 !important;
+    color: var(--m3-on-surface) !important;
+    text-decoration: none;
+}
+
+/* Icon Buttons (M3 Standard) */
+.wg-icon-button {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    color: var(--m3-on-surface-variant);
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+}
+
+.wg-icon-button:hover,
+.wg-icon-button:focus {
+    background-color: rgba(255, 255, 255, 0.08);
+    /* M3 Hover State Layer */
+    outline: none;
+}
+
+.wg-icon-button:active {
+    background-color: rgba(255, 255, 255, 0.12);
+    /* M3 Pressed State Layer */
+}
+
+/* Hamburger toggle */
+.wg-btn-toggle-sidebar {
+    padding: 0;
+    width: 42px;
+    height: 42px;
+}
+
+.wg-btn-toggle-sidebar:hover,
+.wg-btn-toggle-sidebar:focus,
+.wg-btn-toggle-sidebar:active {
+    background-color: transparent !important;
+}
+
+.wg-sidebar-toggle-svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+    transition: transform 0.3s ease, fill 0.3s ease;
+}
+
+.wg-icon-button:hover .wg-sidebar-toggle-svg {
+    fill: var(--m3-primary);
+}
+
+.wg-icon-button.is-hidden .wg-sidebar-toggle-svg {
+    transform: rotateY(180deg);
+}
+
+/* Favorites Button & Badge */
+.wg-icon-button .dashicons-heart {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wg-icon-button:hover .dashicons-heart {
+    color: var(--m3-error);
+}
+
+.wg-fav-count {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: var(--m3-error);
+    color: white;
+    font-size: 11px;
+    /* M3 Label Small */
+    font-weight: 500;
+    min-width: 16px;
+    height: 16px;
+    line-height: 16px;
+    border-radius: 8px;
+    /* M3 fully rounded badge */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    text-align: center;
+}
+
+/* Search Bar (M3 Pill shape) */
+.wg-top-header form.wp-block-search {
+    width: 100%;
+    margin: 0;
+}
+
+.wg-top-header .wp-block-search__inside-wrapper {
+    display: flex;
+    align-items: center;
+    background: var(--m3-surface-container-high);
+    border-radius: 28px;
+    /* M3 fully rounded */
+    height: 48px;
+    /* M3 Search bar height */
+    padding: 0 16px;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    border: 1px solid transparent;
+}
+
+.wg-top-header .wp-block-search__inside-wrapper:hover {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.wg-top-header .wp-block-search__inside-wrapper:focus-within {
+    background: var(--m3-surface-container-high);
+    border-color: var(--m3-primary);
+}
+
+.wg-top-header .wp-block-search__input {
+    background: transparent;
+    border: none;
+    color: var(--m3-on-surface);
+    font-size: 16px;
+    /* M3 Body Large */
+    padding: 0 12px;
+    width: 100%;
+    height: 100%;
+    outline: none;
+    box-shadow: none !important;
+}
+
+.wg-top-header .wp-block-search__input::placeholder {
+    color: var(--m3-on-surface-variant);
+}
+
+/* Leading Icon for Search */
+.wg-top-header .wp-block-search__button {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: var(--m3-on-surface-variant);
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    order: -1;
+    /* Move icon to the left of the input */
+}
+
+.wg-top-header .wp-block-search__button svg.search-icon {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+
+/* User Shortcode Wrapper */
+.wg-header-user-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+/* Responsive Mobile */
+.wg-mobile-search-toggle {
+    display: none;
+}
+
+/* Mobile Search Overlay */
+.wg-mobile-search-overlay {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--m3-surface);
+    z-index: 101;
+    align-items: center;
+    padding: 0 16px;
+    box-sizing: border-box;
+}
+
+.wg-mobile-search-overlay.is-active {
+    display: flex;
+}
+
+.wg-mobile-search-overlay .wp-block-search {
+    width: 100%;
+    flex-grow: 1;
+}
+
+.wg-mobile-search-close {
+    margin-left: 8px;
+    color: var(--m3-on-surface-variant);
+}
+
+@media (max-width: 768px) {
+    .wg-top-header {
+        padding: 0 8px;
+    }
+
+    .wg-header-left,
+    .wg-header-right {
+        gap: 8px;
+    }
+
+    .wg-header-center {
+        display: none;
+        /* Hide main search bar */
+    }
+
+    .wg-mobile-search-toggle {
+        display: flex;
+        /* Show search toggle icon */
+    }
+
+    .wg-btn-toggle-sidebar.is-mobile-open .wg-sidebar-toggle-svg {
+        transform: rotateY(180deg);
+    }
+}
+
+/* Header Login Modal & Profile Menu - Material Design 3 */
+.wg-header-user-wrapper {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.wg-btn-header-login {
+    height: 40px;
+    padding: 0 24px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.wg-login-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    /* M3 Scrim */
+    backdrop-filter: blur(2px);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wg-login-modal {
+    background: var(--m3-surface-container-high, #2b2f36);
+    border-radius: 28px;
+    /* M3 Basic Dialog */
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    /* Elevation 3 approx */
+    border: none;
+}
+
+.wg-login-modal-title {
+    margin: 0 0 16px 0;
+    font-size: 24px;
+    font-weight: 400;
+    text-align: center;
+    color: var(--m3-on-surface, #e2e2e9);
+}
+
+.wg-login-modal-subtitle {
+    margin: 0 0 24px 0;
+    font-size: 14px;
+    text-align: center;
+    color: var(--m3-on-surface-variant, #c4c6d0);
+}
+
+.wg-btn-close-modal {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 48px;
+    height: 48px;
+    background: transparent;
+    border: none;
+    color: var(--m3-on-surface-variant, #c4c6d0);
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.wg-btn-close-modal:hover {
+    background: var(--m3-surface-container-highest, #363a41);
+}
+
+/* Social Buttons inside and outside modal */
+.wg-social-login-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.wg-btn-social,
+.wg-btn-normal-login {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 40px;
+    border-radius: 100px;
+    /* M3 Pill shape */
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none !important;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    border: 1px solid var(--m3-outline, #8e9099);
+    background: transparent;
+    color: var(--m3-on-surface, #e2e2e9);
+    width: 100%;
+}
+
+.wg-btn-social svg {
+    flex-shrink: 0;
+}
+
+.wg-btn-social:hover {
+    background-color: var(--m3-surface-container-highest, #363a41);
+}
+
+/* For Google/Facebook specifically if you want them to retain brand colors, otherwise M3 outlined is above */
+/* If you want filled brand colors, uncomment these:
+.wg-btn-google { background-color: #ffffff; color: #3c4043; border: none; }
+.wg-btn-facebook { background-color: #1877F2; color: #ffffff; border: none; }
+*/
+
+.wg-btn-normal-login {
+    background: var(--m3-primary, #a8c7fa);
+    color: var(--m3-on-primary, #062e6f);
+    border: none;
+}
+
+.wg-btn-normal-login:hover {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    /* Elevation 1 */
+    opacity: 0.9;
+}
+
+/* Profile Chip */
+.wg-header-profile-btn {
+    background: var(--m3-surface-container, #1e2025);
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    height: 32px;
+    padding: 0 12px 0 4px;
+    /* Less padding on left for avatar */
+    border-radius: 8px;
+    /* M3 Input Chip */
+    transition: background-color 0.2s;
+}
+
+.wg-header-avatar {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.wg-header-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--m3-on-surface, #e2e2e9);
+}
+
+.wg-header-profile-dropdown-icon {
+    font-size: 16px;
+    line-height: 1;
+    color: var(--m3-on-surface-variant, #c4c6d0);
+    display: flex;
+    align-items: center;
+}
+
+.wg-header-profile-btn:hover {
+    background: var(--m3-surface-container-high, #2b2f36);
+}
+
+/* Profile Menu */
+.wg-header-profile-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--m3-surface-container, #1e2025);
+    border-radius: 4px;
+    /* M3 Menu */
+    padding: 8px 0;
+    min-width: 160px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    /* Elevation 2 */
+    z-index: 100;
+}
+
+.wg-logout-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--m3-on-surface, #e2e2e9);
+    text-decoration: none;
+    padding: 8px 16px;
+    transition: background-color 0.2s;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.wg-logout-link .dashicons {
+    color: var(--m3-on-surface-variant, #c4c6d0);
+}
+
+.wg-logout-link:hover {
+    background: var(--m3-surface-container-high, #2b2f36);
+}

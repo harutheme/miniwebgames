@@ -65,6 +65,7 @@ class Webgames_Shortcodes {
 
     public function register_assets() {
         wp_enqueue_style( 'dashicons' );
+        wp_enqueue_style( 'webgames-header-style', WEBGAMES_PLUGIN_URL . 'assets/css/header.css', array(), '1.0.0' );
         wp_enqueue_style( 'webgames-elements-style', WEBGAMES_PLUGIN_URL . 'assets/css/elements.css', array(), '1.0.0' );
         wp_enqueue_style( 'webgames-player-style', WEBGAMES_PLUGIN_URL . 'assets/css/player.css', array('webgames-elements-style', 'dashicons'), '1.0.0' );
         wp_enqueue_script( 'webgames-player-js', WEBGAMES_PLUGIN_URL . 'assets/js/player.js', array( 'jquery' ), '1.0.0', true );
@@ -350,7 +351,7 @@ class Webgames_Shortcodes {
                 }
             }
             
-            echo '<li><a href="' . esc_url( $link ) . '">' . $icon_html . '<span class="wg-cat-text">' . esc_html( $term->name ) . '</span></a></li>';
+            echo '<li><a href="' . esc_url( $link ) . '"><span class="wg-cat-icon-wrapper">' . trim($icon_html) . '</span><span class="wg-cat-text">' . esc_html( $term->name ) . '</span></a></li>';
         }
         echo '</ul>';
         return ob_get_clean();
@@ -941,22 +942,20 @@ class Webgames_Shortcodes {
 
         ob_start();
         ?>
-        <div class="wg-header-user-wrapper" style="opacity: 0; transition: opacity 0.3s; position: relative;">
+        <div class="wg-header-user-wrapper wg-user-inner-wrapper" style="opacity: 0; transition: opacity 0.3s; position: relative; display: flex; align-items: center; height: 100%;">
             
-            <!-- Logged OUT State -->
-            <div class="wg-header-logged-out" style="display: none;">
-                <button class="wg-btn wg-btn-primary wg-btn-header-login" style="padding: 5px 15px; font-size: 14px;">
+            <div class="wg-header-logged-out" style="display: none; align-items: center; height: 100%;">
+                <button class="wg-btn wg-btn-primary wg-btn-header-login" style="margin: 0;">
                     <?php _e( 'Login', 'webgames' ); ?>
                 </button>
 
-                <!-- Login Modal -->
                 <div class="wg-login-modal-overlay wg-header-login-modal" style="display: none;">
                     <div class="wg-login-modal">
                         <button class="wg-btn-close-modal"><span class="dashicons dashicons-no-alt"></span></button>
-                        <h3 style="margin-top:0; color:#fff; text-align:center;"><?php _e( 'Login to Play', 'webgames' ); ?></h3>
-                        <p style="text-align:center; color:#a4b0be; margin-bottom: 20px; font-size: 14px;"><?php _e( 'Choose a social account to continue', 'webgames' ); ?></p>
+                        <h3 class="wg-login-modal-title"><?php _e( 'Login to Play', 'webgames' ); ?></h3>
+                        <p class="wg-login-modal-subtitle"><?php _e( 'Choose a social account to continue', 'webgames' ); ?></p>
                         
-                        <div class="wg-social-login-buttons" style="flex-direction: column;">
+                        <div class="wg-social-login-buttons">
                         <?php if ( ! empty( $google_id ) ) : 
                             $google_auth_url = add_query_arg( array(
                                 'client_id'     => $google_id,
@@ -966,7 +965,7 @@ class Webgames_Shortcodes {
                                 'state'         => $state,
                             ), 'https://accounts.google.com/o/oauth2/v2/auth' );
                         ?>
-                            <a href="<?php echo esc_url( $google_auth_url ); ?>" class="wg-btn-social wg-btn-google" style="width: 100%;">
+                            <a href="<?php echo esc_url( $google_auth_url ); ?>" class="wg-btn-social wg-btn-google">
                                 <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
                                 <span><?php _e( 'Continue with Google', 'webgames' ); ?></span>
                             </a>
@@ -980,25 +979,24 @@ class Webgames_Shortcodes {
                                 'scope'         => 'email,public_profile',
                             ), 'https://www.facebook.com/v19.0/dialog/oauth' );
                         ?>
-                            <a href="<?php echo esc_url( $fb_auth_url ); ?>" class="wg-btn-social wg-btn-facebook" style="width: 100%;">
+                            <a href="<?php echo esc_url( $fb_auth_url ); ?>" class="wg-btn-social wg-btn-facebook">
                                 <svg width="18" height="18" viewBox="0 0 320 512"><path fill="#ffffff" d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg>
                                 <span><?php _e( 'Continue with Facebook', 'webgames' ); ?></span>
                             </a>
                         <?php endif; ?>
                         <?php if ( empty( $google_id ) && empty( $facebook_id ) ) : ?>
-                            <a href="<?php echo esc_url( wp_login_url( $current_url ) ); ?>" class="wg-btn wg-btn-primary" style="width: 100%; text-align:center;"><?php _e('Normal Login', 'webgames'); ?></a>
+                            <a href="<?php echo esc_url( wp_login_url( $current_url ) ); ?>" class="wg-btn wg-btn-primary wg-btn-normal-login"><?php _e('Normal Login', 'webgames'); ?></a>
                         <?php endif; ?>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Logged IN State -->
-            <div class="wg-header-logged-in" style="display: none; position: relative;">
-                <button class="wg-header-profile-btn">
-                    <img class="wg-header-avatar" src="" alt="Avatar" width="24" height="24" style="border-radius: 50%; object-fit: cover;">
-                    <span class="wg-header-name" style="font-size: 14px; font-weight: 600; color: #fff;"></span>
-                    <span class="dashicons dashicons-arrow-down-alt2" style="font-size: 14px; line-height: 24px; color: #a4b0be;"></span>
+            <div class="wg-header-logged-in" style="display: none; position: relative; align-items: center; height: 100%;">
+                <button class="wg-header-profile-btn" style="margin: 0;">
+                    <img class="wg-header-avatar" src="" alt="Avatar" width="24" height="24">
+                    <span class="wg-header-name"></span>
+                    <span class="dashicons dashicons-arrow-down-alt2 wg-header-profile-dropdown-icon"></span>
                 </button>
                 <div class="wg-header-profile-menu" style="display:none;">
                     <a href="<?php echo esc_url( wp_logout_url( $current_url ) ); ?>" class="wg-logout-link">
@@ -1011,7 +1009,7 @@ class Webgames_Shortcodes {
         
         <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var wrappers = document.querySelectorAll('.wg-header-user-wrapper');
+            var wrappers = document.querySelectorAll('.wg-user-inner-wrapper');
             if (wrappers.length === 0) return;
 
             var getCookie = function(name) {
@@ -1044,9 +1042,9 @@ class Webgames_Shortcodes {
                             avatarEl.style.display = 'none';
                         }
                     }
-                    if (loggedIn) loggedIn.style.display = 'block';
+                    if (loggedIn) loggedIn.style.display = 'flex';
                 } else {
-                    if (loggedOut) loggedOut.style.display = 'block';
+                    if (loggedOut) loggedOut.style.display = 'flex';
                 }
                 wrapper.style.opacity = '1';
                 var btnLogin = wrapper.querySelector('.wg-btn-header-login');
@@ -1441,27 +1439,27 @@ class Webgames_Shortcodes {
         <ul class="wg-cat-menu wg-discover-menu" style="margin-bottom: 20px;">
             <li>
                 <a href="<?php echo esc_url( home_url('/') ); ?>">
-                    <span class="dashicons dashicons-admin-home"></span> <span class="wg-cat-text"><?php _e('Home', 'webgames'); ?></span>
+                    <span class="wg-cat-icon-wrapper"><span class="dashicons dashicons-admin-home"></span></span><span class="wg-cat-text"><?php _e('Home', 'webgames'); ?></span>
                 </a>
             </li>
             <li>
                 <a href="<?php echo esc_url( add_query_arg('sort', 'new', $archive_link) ); ?>">
-                    <span class="dashicons dashicons-star-filled"></span> <span class="wg-cat-text"><?php _e('New', 'webgames'); ?></span>
+                    <span class="wg-cat-icon-wrapper"><span class="dashicons dashicons-star-filled"></span></span><span class="wg-cat-text"><?php _e('New', 'webgames'); ?></span>
                 </a>
             </li>
             <li>
                 <a href="<?php echo esc_url( add_query_arg('sort', 'hot', $archive_link) ); ?>">
-                    <span class="dashicons dashicons-megaphone"></span> <span class="wg-cat-text"><?php _e('Hot', 'webgames'); ?></span>
+                    <span class="wg-cat-icon-wrapper"><span class="dashicons dashicons-megaphone"></span></span><span class="wg-cat-text"><?php _e('Hot', 'webgames'); ?></span>
                 </a>
             </li>
             <li>
                 <a href="<?php echo esc_url( add_query_arg('sort', 'popular', $archive_link) ); ?>">
-                    <span class="dashicons dashicons-chart-bar"></span> <span class="wg-cat-text"><?php _e('Most Played', 'webgames'); ?></span>
+                    <span class="wg-cat-icon-wrapper"><span class="dashicons dashicons-chart-bar"></span></span><span class="wg-cat-text"><?php _e('Most Played', 'webgames'); ?></span>
                 </a>
             </li>
             <li>
                 <a href="<?php echo esc_url( add_query_arg('sort', 'rating', $archive_link) ); ?>">
-                    <span class="dashicons dashicons-awards"></span> <span class="wg-cat-text"><?php _e('Best Rating', 'webgames'); ?></span>
+                    <span class="wg-cat-icon-wrapper"><span class="dashicons dashicons-awards"></span></span><span class="wg-cat-text"><?php _e('Best Rating', 'webgames'); ?></span>
                 </a>
             </li>
         </ul>
@@ -1473,7 +1471,11 @@ class Webgames_Shortcodes {
      * Filter FSE Blocks to replace [icon:name] with Dashicons
      */
     public function filter_nav_link_icon( $block_content, $block ) {
-        return $this->replace_icon_tags( $block_content );
+        $content = $this->replace_icon_tags( $block_content );
+        // Move the icon wrapper outside the label span so it remains visible when the label is hidden
+        $pattern = '/(<span[^>]*class="[^"]*wp-block-navigation-item__label[^"]*"[^>]*>)\s*(<span class="wg-cat-icon-wrapper">.*?<\/span><\/span>)\s*/is';
+        $content = preg_replace( $pattern, '$2$1', $content );
+        return $content;
     }
 
     public function filter_content_icon( $content ) {
@@ -1495,7 +1497,7 @@ class Webgames_Shortcodes {
             } else {
                 $icon_class = $icon_name;
             }
-            return '<span class="dashicons ' . esc_attr( $icon_class ) . '"></span>';
+            return '<span class="wg-cat-icon-wrapper"><span class="dashicons ' . esc_attr( $icon_class ) . '"></span></span>';
         }, $content );
         return $content;
     }

@@ -218,3 +218,14 @@ add_action('pre_get_posts', function($query) {
         }
     }
 });
+
+// Conditionally hide site title if custom logo exists
+add_filter( 'render_block_core/site-title', function( $block_content, $block ) {
+    if ( ! is_admin() && ! wp_is_json_request() ) {
+        if ( has_custom_logo() ) {
+            return '';
+        }
+    }
+    return $block_content;
+}, 10, 2 );
+

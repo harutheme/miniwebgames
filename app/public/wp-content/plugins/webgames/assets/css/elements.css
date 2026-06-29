@@ -75,7 +75,7 @@
     flex-wrap: nowrap;
     align-items: stretch;
     width: 100%;
-    min-height: calc(100vh - 60px);
+    min-height: calc(100vh - var(--wg-header-height));
     /* Adjust based on header height */
     position: relative;
     overflow-x: clip;
@@ -94,8 +94,8 @@
     box-sizing: border-box;
     margin-top: 0 !important;
     position: sticky;
-    top: 60px;
-    height: calc(100vh - 60px);
+    top: var(--wg-header-height);
+    height: calc(100vh - var(--wg-header-height));
     z-index: 90;
 }
 
@@ -132,28 +132,42 @@
 
 /* Hide footer text gracefully in mini mode */
 .wg-sidebar-vertical .wg-sidebar-copyright,
-.wg-sidebar-vertical .wp-block-navigation {
+.wg-sidebar-vertical .wp-block-social-links {
     transition: opacity 0.2s, visibility 0.2s;
 }
 
 .wg-sidebar-vertical:hover .wg-sidebar-copyright,
-.wg-sidebar-vertical:hover .wp-block-navigation {
+.wg-sidebar-vertical:hover .wp-block-social-links {
     opacity: 1;
     visibility: visible;
 }
 
 /* Custom Scrollbar for Sidebar */
+.wg-sidebar-inner {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.3s ease;
+}
+
+.wg-sidebar-inner:hover {
+    scrollbar-color: #485460 transparent;
+}
+
 .wg-sidebar-inner::-webkit-scrollbar {
     width: 6px;
 }
 
 .wg-sidebar-inner::-webkit-scrollbar-track {
-    background: #111418;
+    background: transparent;
 }
 
 .wg-sidebar-inner::-webkit-scrollbar-thumb {
-    background: #485460;
+    background: transparent;
     border-radius: 3px;
+}
+
+.wg-sidebar-inner:hover::-webkit-scrollbar-thumb {
+    background: #485460;
 }
 
 .wg-sidebar-inner::-webkit-scrollbar-thumb:hover {
@@ -186,46 +200,13 @@
     }
 
     body.admin-bar .wg-sidebar-vertical {
-        top: 92px;
-        /* 32px admin bar + 60px header */
-        height: calc(100vh - 92px);
+        top: calc(32px + var(--wg-header-height));
+        /* 32px admin bar + header */
+        height: calc(100vh - (32px + var(--wg-header-height)));
     }
 }
 
-.wg-top-header {
-    height: 60px;
-    background: #111418;
-    border-bottom: 1px solid #1e272e;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-}
 
-.wg-header-left,
-.wg-header-center,
-.wg-header-right {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.wg-header-center {
-    flex-grow: 1;
-    max-width: 600px;
-    margin: 0 20px;
-}
-
-.wg-btn-toggle-sidebar {
-    background: transparent;
-    border: none;
-    color: #fff;
-    font-size: 24px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
 /* Category Menu */
 .wg-cat-menu {
@@ -307,23 +288,62 @@
     font-weight: 500;
 }
 
+/* Base Icon Wrapper */
+.wg-cat-icon-wrapper,
+.wg-sidebar-vertical .wp-block-navigation-item .dashicons {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* Unified Sidebar Structure (Desktop & Tablet) */
+@media (min-width: 992px) {
+    .wg-sidebar-inner,
+    .wg-sidebar-scroll-area {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    .wg-cat-icon-wrapper,
+    .wg-sidebar-vertical .wp-block-navigation-item .dashicons {
+        width: 64px;
+    }
+
+    .wg-cat-menu li a,
+    .wg-sidebar-vertical .wp-block-navigation-item__content {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        flex-wrap: nowrap !important;
+        padding-left: 0 !important;
+        padding-right: 16px !important;
+        gap: 0 !important;
+    }
+
+    .wg-sidebar-vertical .wg-cat-heading,
+    .wg-sidebar-vertical .wg-sidebar-copyright {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+}
+
 /* Mini Mode: Laptop / Tablet Landscape (992px - 1599px) */
 @media (max-width: 1599px) and (min-width: 992px) {
     .wg-sidebar-vertical {
-        width: 60px;
+        width: 64px;
     }
 
     .wg-sidebar-inner {
-        width: 60px;
+        width: 64px;
         position: absolute;
         left: 0;
         top: 0;
-        padding: 20px 10px;
-        /* Adjust padding for mini icons */
     }
 
     /* Hide Text gracefully */
-    .wg-sidebar-vertical .wg-cat-text {
+    .wg-sidebar-vertical .wg-cat-text,
+    .wg-sidebar-vertical .wp-block-navigation-item__label {
         opacity: 0;
         visibility: hidden;
         transition: opacity 0.2s, visibility 0.2s;
@@ -332,7 +352,7 @@
 
     .wg-sidebar-vertical .wg-cat-heading,
     .wg-sidebar-vertical .wg-sidebar-copyright,
-    .wg-sidebar-vertical .wp-block-navigation {
+    .wg-sidebar-vertical .wp-block-social-links {
         opacity: 0;
         visibility: hidden;
         transition: opacity 0.2s, visibility 0.2s;
@@ -345,14 +365,16 @@
     }
 
     .wg-sidebar-vertical:hover .wg-cat-text,
-    .wg-sidebar-vertical:hover .wg-cat-heading {
+    .wg-sidebar-vertical:hover .wp-block-navigation-item__label,
+    .wg-sidebar-vertical:hover .wg-cat-heading,
+    .wg-sidebar-vertical:hover .wp-block-social-links {
         opacity: 1;
         visibility: visible;
     }
 
     /* Override hidden state for mini mode */
     .wg-sidebar-vertical.is-hidden {
-        margin-left: -60px;
+        margin-left: -64px;
     }
 }
 
