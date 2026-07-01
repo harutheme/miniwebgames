@@ -30,6 +30,7 @@ class Webgames_Shortcodes {
         add_shortcode( 'webgames_all_tags', array( $this, 'all_tags_shortcode' ) );
         add_shortcode( 'webgames_game_slider', array( $this, 'game_slider_shortcode' ) );
         add_shortcode( 'webgames_home_ad', array( $this, 'home_ad_shortcode' ) );
+        add_shortcode( 'webgames_page_share', array( $this, 'page_share_shortcode' ) );
 
         // Magic tag filter for icon
         add_filter( 'render_block_core/navigation-link', array( $this, 'filter_nav_link_icon' ), 10, 2 );
@@ -395,7 +396,9 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
                 }
             }
             
-            echo '<li><a href="' . esc_url( $link ) . '"><span class="wg-cat-icon-wrapper">' . trim($icon_html) . '</span><span class="wg-cat-text">' . esc_html( $term->name ) . '</span></a></li>';
+            $li_class = is_tax( 'game-category', $term->term_id ) ? 'active' : '';
+            
+            echo '<li class="' . esc_attr( $li_class ) . '"><a href="' . esc_url( $link ) . '"><span class="wg-cat-icon-wrapper">' . trim($icon_html) . '</span><span class="wg-cat-text">' . esc_html( $term->name ) . '</span></a></li>';
         }
         echo '</ul>';
         return ob_get_clean();
@@ -437,12 +440,29 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
         return ob_get_clean();
     }
 
-    public function render_breadcrumbs() {
+    public function render_breadcrumbs( $atts = [] ) {
+        $atts = shortcode_atts( array(
+            'title' => '',
+        ), $atts, 'webgames_breadcrumbs' );
+
         $separator = ' <span class="wg-breadcrumb-sep">/</span> ';
         $home = '<a href="' . home_url() . '" class="wg-breadcrumb-home"><span class="dashicons dashicons-admin-home"></span> ' . esc_html__( 'Home', 'webgames' ) . '</a>';
         
         $html = '<div class="wg-breadcrumbs">';
         $html .= $home;
+
+        $current_title = !empty($atts['title']) ? $atts['title'] : '';
+        if ( empty( $current_title ) ) {
+            $queried_object = get_queried_object();
+            if ( $queried_object && isset( $queried_object->post_title ) ) {
+                $current_title = $queried_object->post_title;
+            } else {
+                $current_title = get_the_title( get_queried_object_id() );
+            }
+            if ( empty( $current_title ) ) {
+                $current_title = get_the_title();
+            }
+        }
 
         if ( is_search() ) {
             $html .= $separator . '<span class="wg-breadcrumb-current">' . sprintf( esc_html__( 'Search Results for "%s"', 'webgames' ), get_search_query() ) . '</span>';
@@ -451,15 +471,21 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
         } elseif ( is_post_type_archive( 'game' ) ) {
             $html .= $separator . '<span class="wg-breadcrumb-current">' . esc_html__( 'All Games', 'webgames' ) . '</span>';
         } elseif ( is_singular( 'game' ) ) {
-            $terms = get_the_terms( get_the_ID(), 'game-category' );
+            $terms = get_the_terms( get_queried_object_id(), 'game-category' );
             if ( $terms && ! is_wp_error( $terms ) ) {
                 $term = $terms[0]; // Get the first category
                 $html .= $separator . '<a href="' . esc_url( get_term_link( $term ) ) . '" class="wg-breadcrumb-cat">' . esc_html( $term->name ) . '</a>';
             }
-            $html .= $separator . '<span class="wg-breadcrumb-current">' . esc_html( get_the_title() ) . '</span>';
+            $html .= $separator . '<span class="wg-breadcrumb-current">' . esc_html( $current_title ) . '</span>';
+        } elseif ( is_singular( 'post' ) ) {
+            $categories = get_the_category();
+            if ( ! empty( $categories ) ) {
+                $html .= $separator . '<a href="' . esc_url( get_category_link( $categories[0]->term_id ) ) . '" class="wg-breadcrumb-cat">' . esc_html( $categories[0]->name ) . '</a>';
+            }
+            $html .= $separator . '<span class="wg-breadcrumb-current">' . esc_html( $current_title ) . '</span>';
         } else {
             // For other pages like My Favorite Games
-            $html .= $separator . '<span class="wg-breadcrumb-current">' . esc_html( get_the_title() ) . '</span>';
+            $html .= $separator . '<span class="wg-breadcrumb-current">' . esc_html( $current_title ) . '</span>';
         }
         
         $html .= '</div>';
@@ -673,13 +699,7 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
                     while ( $query->have_posts() ) {
                         $query->the_post();
                         
-                        // Inject Ad after 4th item (index 3, so when count hits 4)
-                        if ( $count === 4 ) {
-                            echo '<div class="wg-archive-ad-box">';
-                            // Placeholder for 2x2 Ad
-                            echo '<div class="wg-ad-placeholder">Ad 4x4 (2x2 Grid)</div>';
-                            echo '</div>';
-                        }
+
                         
                         echo $this->get_game_card_html( get_the_ID(), 'medium', 'wg-game-card' );
                         $count++;
@@ -734,11 +754,25 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
     public function favorite_games_shortcode( $atts ) {
         ob_start();
         ?>
-        <div id="wg-favorite-games-container" style="min-height: 500px;" class="wg-fade-content">
+        <div id="wg-favorite-games-container" data-post-id="<?php echo get_the_ID(); ?>" class="wg-fade-content" style="min-height: 500px;">
             <div class="wg-archive-container wg-skeleton-container">
-                <div class="wg-archive-header" style="height: 40px; margin-bottom: 20px;">
-                    <div class="wg-skeleton-pulse" style="width: 250px; height: 32px; border-radius: 5px;"></div>
+                <!-- Skeleton Breadcrumbs -->
+                <div class="wg-archive-breadcrumbs">
+                    <?php echo do_shortcode('[webgames_breadcrumbs title="' . esc_attr( get_the_title() ) . '"]'); ?>
                 </div>
+
+                <!-- Skeleton Header -->
+                <div class="wg-archive-header">
+                    <div class="wg-archive-header-left" style="display: flex; align-items: baseline; gap: 15px; flex-wrap: wrap;">
+                        <h1 class="wg-archive-title" style="margin-bottom: 0;"><?php echo esc_html( get_the_title() ); ?></h1>
+                        <p class="wg-result-count wg-skeleton-pulse" style="width: 150px; height: 20px; border-radius: 4px; margin-bottom: 0;"></p>
+                    </div>
+                    <div class="wg-archive-header-right">
+                        <!-- Skeleton Dropdown -->
+                        <div class="wg-skeleton-pulse" style="width: 180px; height: 42px; border-radius: 6px;"></div>
+                    </div>
+                </div>
+
                 <div class="wg-archive-grid-wrapper">
                     <?php for ( $i = 0; $i < 12; $i++ ) : ?>
                     <div class="wg-game-card" style="background: transparent; box-shadow: none;">
@@ -788,15 +822,14 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
      * AJAX Handler for Favorite Games
      */
     public function ajax_get_favorites() {
-        if ( ! isset( $_POST['ids'] ) || ! is_array( $_POST['ids'] ) ) {
-            wp_send_json_error( '<div class="wg-favorite-empty"><span class="dashicons dashicons-heart"></span><p>' . __( 'You haven\'t favorited any games yet.', 'webgames' ) . '</p></div>' );
+        $post_ids = array();
+        if ( isset( $_POST['ids'] ) && is_array( $_POST['ids'] ) ) {
+            $post_ids = array_map( 'intval', $_POST['ids'] );
+            $post_ids = array_filter( $post_ids ); // Remove zeros
         }
 
-        $post_ids = array_map( 'intval', $_POST['ids'] );
-        $post_ids = array_filter( $post_ids ); // Remove zeros
-
         if ( empty( $post_ids ) ) {
-            wp_send_json_error( '<div class="wg-favorite-empty"><span class="dashicons dashicons-heart"></span><p>' . __( 'You haven\'t favorited any games yet.', 'webgames' ) . '</p></div>' );
+            $post_ids = array( 0 ); // ensures query returns nothing
         }
 
         $paged = isset( $_POST['page'] ) ? max( 1, intval( $_POST['page'] ) ) : 1;
@@ -822,6 +855,14 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
             $args['meta_value'] = 'new';
             $args['orderby'] = 'date';
             $args['order'] = 'DESC';
+        } elseif ( $sort === 'popular' ) {
+            $args['meta_key'] = 'wg_views';
+            $args['orderby'] = 'meta_value_num';
+            $args['order'] = 'DESC';
+        } elseif ( $sort === 'rating' ) {
+            $args['meta_key'] = '_game_rating';
+            $args['orderby'] = 'meta_value_num';
+            $args['order'] = 'DESC';
         } elseif ( $sort === 'latest' ) {
             $args['orderby'] = 'date';
             $args['order'] = 'DESC';
@@ -845,13 +886,17 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
         <div class="wg-archive-container">
             <!-- Breadcrumbs -->
             <div class="wg-archive-breadcrumbs">
-                <?php echo do_shortcode('[webgames_breadcrumbs]'); ?>
+                <?php 
+                $post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+                $page_title = $post_id ? get_the_title( $post_id ) : __( 'My Favorite Games', 'webgames' );
+                echo do_shortcode('[webgames_breadcrumbs title="' . esc_attr( $page_title ) . '"]'); 
+                ?>
             </div>
 
             <!-- Header Block -->
             <div class="wg-archive-header">
                 <div class="wg-archive-header-left" style="display: flex; align-items: baseline; gap: 15px; flex-wrap: wrap;">
-                    <h1 class="wg-archive-title" style="margin-bottom: 0;"><?php _e( 'My Favorite Games', 'webgames' ); ?></h1>
+                    <h1 class="wg-archive-title" style="margin-bottom: 0;"><?php echo esc_html( $page_title ); ?></h1>
                     <?php
                     $total_results = $query->found_posts;
                     $current_page = max( 1, $paged );
@@ -880,6 +925,8 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
                             <option value="latest" <?php selected( $sort, 'latest' ); ?>><?php _e( 'Latest', 'webgames' ); ?></option>
                             <option value="hot" <?php selected( $sort, 'hot' ); ?>><?php _e( 'Hot', 'webgames' ); ?></option>
                             <option value="new" <?php selected( $sort, 'new' ); ?>><?php _e( 'New', 'webgames' ); ?></option>
+                            <option value="popular" <?php selected( $sort, 'popular' ); ?>><?php _e( 'Most Played', 'webgames' ); ?></option>
+                            <option value="rating" <?php selected( $sort, 'rating' ); ?>><?php _e( 'Best Rating', 'webgames' ); ?></option>
                         </select>
                     </form>
                 </div>
@@ -893,13 +940,7 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
                 while ( $query->have_posts() ) {
                     $query->the_post();
 
-                    // Inject Ad after 4th item (index 3, so when count hits 4)
-                    if ( $count === 4 ) {
-                        echo '<div class="wg-archive-ad-box">';
-                        // Placeholder for 2x2 Ad
-                        echo '<div class="wg-ad-placeholder">Ad 4x4 (2x2 Grid)</div>';
-                        echo '</div>';
-                    }
+
 
                     echo $this->get_game_card_html( get_the_ID(), 'medium', 'wg-game-card', true );
                     $count++;
@@ -1135,11 +1176,25 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
     public function recently_played_shortcode( $atts ) {
         ob_start();
         ?>
-        <div id="wg-recently-played-container" style="min-height: 500px;" class="wg-fade-content">
+        <div id="wg-recently-played-container" data-post-id="<?php echo get_the_ID(); ?>" class="wg-fade-content" style="min-height: 500px;">
             <div class="wg-archive-container wg-skeleton-container">
-                <div class="wg-archive-header" style="height: 40px; margin-bottom: 20px;">
-                    <div class="wg-skeleton-pulse" style="width: 250px; height: 32px; border-radius: 5px;"></div>
+                <!-- Skeleton Breadcrumbs -->
+                <div class="wg-archive-breadcrumbs">
+                    <?php echo do_shortcode('[webgames_breadcrumbs title="' . esc_attr( get_the_title() ) . '"]'); ?>
                 </div>
+
+                <!-- Skeleton Header -->
+                <div class="wg-archive-header">
+                    <div class="wg-archive-header-left" style="display: flex; align-items: baseline; gap: 15px; flex-wrap: wrap;">
+                        <h1 class="wg-archive-title" style="margin-bottom: 0;"><?php echo esc_html( get_the_title() ); ?></h1>
+                        <p class="wg-result-count wg-skeleton-pulse" style="width: 150px; height: 20px; border-radius: 4px; margin-bottom: 0;"></p>
+                    </div>
+                    <div class="wg-archive-header-right">
+                        <!-- Skeleton Dropdown -->
+                        <div class="wg-skeleton-pulse" style="width: 180px; height: 42px; border-radius: 6px;"></div>
+                    </div>
+                </div>
+
                 <div class="wg-archive-grid-wrapper">
                     <?php for ( $i = 0; $i < 12; $i++ ) : ?>
                     <div class="wg-game-card" style="background: transparent; box-shadow: none;">
@@ -1181,15 +1236,14 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
     }
 
     public function ajax_get_recently_played() {
-        if ( ! isset( $_POST['ids'] ) || ! is_array( $_POST['ids'] ) ) {
-            wp_send_json_error( '<div class="wg-recent-empty"><span class="dashicons dashicons-backup"></span><p>' . __( 'You haven\'t played any games yet.', 'webgames' ) . '</p></div>' );
+        $post_ids = array();
+        if ( isset( $_POST['ids'] ) && is_array( $_POST['ids'] ) ) {
+            $post_ids = array_map( 'intval', $_POST['ids'] );
+            $post_ids = array_filter( $post_ids );
         }
 
-        $post_ids = array_map( 'intval', $_POST['ids'] );
-        $post_ids = array_filter( $post_ids );
-
         if ( empty( $post_ids ) ) {
-            wp_send_json_error( '<div class="wg-recent-empty"><span class="dashicons dashicons-backup"></span><p>' . __( 'You haven\'t played any games yet.', 'webgames' ) . '</p></div>' );
+            $post_ids = array( 0 ); // ensures query returns nothing
         }
 
         $paged = isset( $_POST['page'] ) ? max( 1, intval( $_POST['page'] ) ) : 1;
@@ -1221,6 +1275,14 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
             $args['meta_key'] = 'game_label';
             $args['meta_value'] = 'new';
             $args['orderby'] = 'date';
+            $args['order'] = 'DESC';
+        } elseif ( $sort === 'popular' ) {
+            $args['meta_key'] = 'wg_views';
+            $args['orderby'] = 'meta_value_num';
+            $args['order'] = 'DESC';
+        } elseif ( $sort === 'rating' ) {
+            $args['meta_key'] = '_game_rating';
+            $args['orderby'] = 'meta_value_num';
             $args['order'] = 'DESC';
         } elseif ( $sort === 'latest' ) {
             $args['orderby'] = 'date';
@@ -1259,13 +1321,17 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
         <div class="wg-archive-container">
             <!-- Breadcrumbs -->
             <div class="wg-archive-breadcrumbs">
-                <?php echo do_shortcode('[webgames_breadcrumbs]'); ?>
+                <?php 
+                $post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+                $page_title = $post_id ? get_the_title( $post_id ) : __( 'Recently Played', 'webgames' );
+                echo do_shortcode('[webgames_breadcrumbs title="' . esc_attr( $page_title ) . '"]'); 
+                ?>
             </div>
 
             <!-- Header Block -->
             <div class="wg-archive-header">
                 <div class="wg-archive-header-left" style="display: flex; align-items: baseline; gap: 15px; flex-wrap: wrap;">
-                    <h1 class="wg-archive-title" style="margin-bottom: 0;"><?php _e( 'Recently Played', 'webgames' ); ?></h1>
+                    <h1 class="wg-archive-title" style="margin-bottom: 0;"><?php echo esc_html( $page_title ); ?></h1>
                     <?php
                     $total_results = $query->found_posts;
                     $current_page = max( 1, $paged );
@@ -1294,6 +1360,8 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
                             <option value="latest" <?php selected( $sort, 'latest' ); ?>><?php _e( 'Latest', 'webgames' ); ?></option>
                             <option value="hot" <?php selected( $sort, 'hot' ); ?>><?php _e( 'Hot', 'webgames' ); ?></option>
                             <option value="new" <?php selected( $sort, 'new' ); ?>><?php _e( 'New', 'webgames' ); ?></option>
+                            <option value="popular" <?php selected( $sort, 'popular' ); ?>><?php _e( 'Most Played', 'webgames' ); ?></option>
+                            <option value="rating" <?php selected( $sort, 'rating' ); ?>><?php _e( 'Best Rating', 'webgames' ); ?></option>
                         </select>
                     </form>
                 </div>
@@ -1307,13 +1375,7 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
                 while ( $query->have_posts() ) {
                     $query->the_post();
 
-                    // Inject Ad after 4th item (index 3, so when count hits 4)
-                    if ( $count === 4 ) {
-                        echo '<div class="wg-archive-ad-box">';
-                        // Placeholder for 2x2 Ad
-                        echo '<div class="wg-ad-placeholder">Ad 4x4 (2x2 Grid)</div>';
-                        echo '</div>';
-                    }
+
 
                     echo $this->get_game_card_html( get_the_ID(), 'medium', 'wg-game-card' );
                     $count++;
@@ -1396,7 +1458,9 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
                 <div class="wg-section-header">
                     <h2 class="wg-section-title"><span class="dashicons <?php echo esc_attr( $icon ); ?>"></span> <?php echo $title; ?></h2>
                     <?php if ( $view_more_link ) : ?>
-                    <a href="<?php echo esc_url( $view_more_link ); ?>" class="wg-view-more"><?php _e('View more', 'webgames'); ?> <span class="dashicons dashicons-arrow-right-alt2"></span></a>
+                    <div class="wg-view-more-wrap">
+                        <a href="<?php echo esc_url( $view_more_link ); ?>" class="wg-view-more"><?php _e('View more', 'webgames'); ?> <span class="dashicons dashicons-arrow-right-alt2"></span></a>
+                    </div>
                     <?php endif; ?>
                 </div>
                 <div class="wg-game-slider" id="<?php echo esc_attr( $slider_id ); ?>-container"></div>
@@ -1453,7 +1517,9 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
             <div class="wg-section-header">
                 <h2 class="wg-section-title"><span class="dashicons <?php echo esc_attr( $icon ); ?>"></span> <?php echo $title; ?></h2>
                 <?php if ( $view_more_link ) : ?>
-                <a href="<?php echo esc_url( $view_more_link ); ?>" class="wg-view-more"><?php _e('View more', 'webgames'); ?> <span class="dashicons dashicons-arrow-right-alt2"></span></a>
+                <div class="wg-view-more-wrap"> 
+                    <a href="<?php echo esc_url( $view_more_link ); ?>" class="wg-view-more"><?php _e('View more', 'webgames'); ?> <span class="dashicons dashicons-arrow-right-alt2"></span></a>
+                </div>
                 <?php endif; ?>
             </div>
             <div class="wg-game-slider">
@@ -1478,30 +1544,37 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
             $archive_link = home_url('/?post_type=game');
         }
 
+        $current_sort = isset( $_GET['sort'] ) ? sanitize_text_field( $_GET['sort'] ) : '';
+        $is_home_active = ( is_front_page() || is_home() ) && empty( $current_sort ) ? ' active' : '';
+        $is_new_active = ( $current_sort === 'new' ) ? ' active' : '';
+        $is_hot_active = ( $current_sort === 'hot' ) ? ' active' : '';
+        $is_popular_active = ( $current_sort === 'popular' ) ? ' active' : '';
+        $is_rating_active = ( $current_sort === 'rating' ) ? ' active' : '';
+
         ob_start();
         ?>
         <ul class="wg-cat-menu wg-discover-menu" style="margin-bottom: 20px;">
-            <li>
+            <li class="<?php echo esc_attr( $is_home_active ); ?>">
                 <a href="<?php echo esc_url( home_url('/') ); ?>">
                     <span class="wg-cat-icon-wrapper"><span class="dashicons dashicons-admin-home"></span></span><span class="wg-cat-text"><?php _e('Home', 'webgames'); ?></span>
                 </a>
             </li>
-            <li>
+            <li class="<?php echo esc_attr( $is_new_active ); ?>">
                 <a href="<?php echo esc_url( add_query_arg('sort', 'new', $archive_link) ); ?>">
                     <span class="wg-cat-icon-wrapper"><span class="dashicons dashicons-star-filled"></span></span><span class="wg-cat-text"><?php _e('New', 'webgames'); ?></span>
                 </a>
             </li>
-            <li>
+            <li class="<?php echo esc_attr( $is_hot_active ); ?>">
                 <a href="<?php echo esc_url( add_query_arg('sort', 'hot', $archive_link) ); ?>">
                     <span class="wg-cat-icon-wrapper"><span class="dashicons dashicons-megaphone"></span></span><span class="wg-cat-text"><?php _e('Hot', 'webgames'); ?></span>
                 </a>
             </li>
-            <li>
+            <li class="<?php echo esc_attr( $is_popular_active ); ?>">
                 <a href="<?php echo esc_url( add_query_arg('sort', 'popular', $archive_link) ); ?>">
                     <span class="wg-cat-icon-wrapper"><span class="dashicons dashicons-chart-bar"></span></span><span class="wg-cat-text"><?php _e('Most Played', 'webgames'); ?></span>
                 </a>
             </li>
-            <li>
+            <li class="<?php echo esc_attr( $is_rating_active ); ?>">
                 <a href="<?php echo esc_url( add_query_arg('sort', 'rating', $archive_link) ); ?>">
                     <span class="wg-cat-icon-wrapper"><span class="dashicons dashicons-awards"></span></span><span class="wg-cat-text"><?php _e('Best Rating', 'webgames'); ?></span>
                 </a>
@@ -1520,6 +1593,21 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
         // Move the icon wrapper outside the label span so it remains visible when the label is hidden
         $pattern = '/(<span[^>]*class="[^"]*wp-block-navigation-item__label[^"]*"[^>]*>)\s*(<span class="wg-cat-icon-wrapper">.*?<\/span><\/span>)\s*/is';
         $content = preg_replace( $pattern, '$2$1', $content );
+
+        // Add active state if the URL matches the current request
+        if ( isset( $block['attrs']['url'] ) ) {
+            $url = $block['attrs']['url'];
+            $current_url = $_SERVER['REQUEST_URI'] ?? '';
+            
+            $parsed_url = wp_parse_url( $url, PHP_URL_PATH );
+            $parsed_current = wp_parse_url( $current_url, PHP_URL_PATH );
+            
+            if ( $parsed_url && $parsed_current && trailingslashit( $parsed_url ) === trailingslashit( $parsed_current ) ) {
+                // Add both current-menu-item (WP standard) and active (our custom) to the li wrapper
+                $content = preg_replace( '/class="([^"]*wp-block-navigation-item[^"]*)"/', 'class="$1 current-menu-item active"', $content, 1 );
+            }
+        }
+
         return $content;
     }
 
@@ -1580,7 +1668,10 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
 
         ob_start();
         ?>
-        <div class="wg-all-tags-container">
+        <div class="wg-archive-container wg-all-tags-container">
+            <div class="wg-archive-breadcrumbs">
+                <?php echo do_shortcode('[webgames_breadcrumbs]'); ?>
+            </div>
             <h1 class="wg-archive-title" style="margin-bottom: 20px;"><?php _e( 'All Tags', 'webgames' ); ?></h1>
             
             <div class="wg-tags-nav">
@@ -1642,6 +1733,58 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
         <div class="wg-home-ad-wrapper" style="margin-bottom: 20px; display: flex; justify-content: center; overflow: hidden; border-radius: 12px; background: #111418; padding: 10px;">
             <?php echo do_shortcode( $ad_code ); ?>
         </div>
+        <?php
+        $html = ob_get_clean();
+        return str_replace( array( "\r\n", "\r", "\n", "\t" ), '', $html );
+    }
+    public function page_share_shortcode() {
+        ob_start();
+        $title = get_the_title();
+        $url   = get_permalink();
+        ?>
+        <div class="wg-page-share-wrapper" style="margin-top: 20px; display: flex; align-items: center; gap: 10px;">
+            <button class="wg-btn wg-btn-share wg-btn-page-share" id="wg-btn-share" data-game-title="<?php echo esc_attr( $title ); ?>" data-game-url="<?php echo esc_url( $url ); ?>" style="padding: 10px 20px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px;">
+                <span class="dashicons dashicons-share"></span> <span><?php _e('Share this page', 'webgames'); ?></span>
+            </button>
+        </div>
+
+        <!-- Share Off-Canvas Sidebar -->
+        <div id="wg-share-sidebar" class="wg-share-sidebar">
+            <div class="wg-share-header">
+                <h3><?php _e('Share this page', 'webgames'); ?></h3>
+                <button id="wg-share-close" class="wg-btn wg-btn-close">
+                    <span class="dashicons dashicons-no-alt"></span>
+                </button>
+            </div>
+            <div class="wg-share-body">
+                <div class="wg-share-grid">
+                    <button class="wg-share-btn wg-share-fb" id="wg-share-fb">
+                        <span class="dashicons dashicons-facebook-alt"></span>
+                        <span>Facebook</span>
+                    </button>
+                    <button class="wg-share-btn wg-share-x" id="wg-share-x">
+                        <span class="dashicons dashicons-twitter"></span>
+                        <span>X (Twitter)</span>
+                    </button>
+                    <button class="wg-share-btn wg-share-instagram" id="wg-share-instagram">
+                        <span class="dashicons dashicons-instagram"></span>
+                        <span>Instagram</span>
+                    </button>
+                    <button class="wg-share-btn wg-share-tiktok" id="wg-share-tiktok">
+                        <svg width="20" height="20" viewBox="0 0 448 512" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z"/></svg>
+                        <span>TikTok</span>
+                    </button>
+                    <button class="wg-share-btn wg-share-copy" id="wg-share-copy">
+                        <span class="dashicons dashicons-admin-links"></span>
+                        <span>Copy Link</span>
+                    </button>
+                </div>
+                <div class="wg-share-copy-feedback" id="wg-share-copy-feedback" style="display: none; text-align: center; color: #44bd32; margin-top: 15px;">
+                    <?php _e('Link copied to clipboard!', 'webgames'); ?>
+                </div>
+            </div>
+        </div>
+        <div id="wg-share-overlay" class="wg-share-overlay"></div>
         <?php
         $html = ob_get_clean();
         return str_replace( array( "\r\n", "\r", "\n", "\t" ), '', $html );

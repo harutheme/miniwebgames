@@ -55,6 +55,7 @@ class Webgames_Settings_Page {
         register_setting( 'webgames_ads_group', 'webgames_top_ad_code' );
         register_setting( 'webgames_ads_group', 'webgames_sidebar_ad_code' );
         register_setting( 'webgames_ads_group', 'webgames_home_ad_code' );
+        register_setting( 'webgames_ads_group', 'webgames_archive_ad_code' );
         register_setting( 'webgames_ads_group', 'webgames_sidebar_max_items', array(
             'type' => 'integer',
             'default' => 20,
@@ -77,9 +78,17 @@ class Webgames_Settings_Page {
         );
 
         add_settings_field(
-            'webgames_top_ad_code', 
-            __( 'Under Player Ad Code', 'webgames' ), 
-            array( $this, 'top_ad_callback' ), 
+            'webgames_home_ad_code', 
+            __( 'Homepage Banner Ad Code', 'webgames' ), 
+            array( $this, 'home_ad_callback' ), 
+            'webgames-ads-admin', 
+            'webgames_setting_section'
+        );
+
+        add_settings_field(
+            'webgames_archive_ad_code', 
+            __( 'Archive & Page Top Ad Code', 'webgames' ), 
+            array( $this, 'archive_ad_callback' ), 
             'webgames-ads-admin', 
             'webgames_setting_section'
         );
@@ -93,9 +102,9 @@ class Webgames_Settings_Page {
         );
 
         add_settings_field(
-            'webgames_home_ad_code', 
-            __( 'Homepage Banner Ad Code', 'webgames' ), 
-            array( $this, 'home_ad_callback' ), 
+            'webgames_top_ad_code', 
+            __( 'Under Player Ad Code', 'webgames' ), 
+            array( $this, 'top_ad_callback' ), 
             'webgames-ads-admin', 
             'webgames_setting_section'
         );
@@ -177,6 +186,12 @@ class Webgames_Settings_Page {
         $val = get_option( 'webgames_home_ad_code' );
         echo '<textarea name="webgames_home_ad_code" rows="5" style="width: 100%; font-family: monospace;">' . esc_textarea( $val ) . '</textarea>';
         echo '<p class="description">' . __( 'Code for homepage banner ad. Displays via [webgames_home_ad] shortcode.', 'webgames' ) . '</p>';
+    }
+
+    public function archive_ad_callback() {
+        $val = get_option( 'webgames_archive_ad_code' );
+        echo '<textarea name="webgames_archive_ad_code" rows="5" style="width: 100%; font-family: monospace;">' . esc_textarea( $val ) . '</textarea>';
+        echo '<p class="description">' . __( 'Code for wide templates (Category, Blog, Pages). Displays via [webgames_archive_ad] shortcode.', 'webgames' ) . '</p>';
     }
 
     public function sidebar_max_items_callback() {

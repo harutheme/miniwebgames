@@ -757,10 +757,8 @@ document.addEventListener('DOMContentLoaded', function() {
             container.innerHTML = `<div class="wg-favorite-empty"><span class="dashicons dashicons-${emptyIcon}"></span><p>${getEmptyText()}</p></div>`;
         };
 
-        if (items.length === 0) {
-            renderEmpty();
-            return;
-        }
+        // If items are empty, we still want to load via AJAX to get the correct layout structure (breadcrumbs, header).
+        // The server will return the empty state inside the layout.
 
         const loadGames = (shouldScroll = false) => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -771,6 +769,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const urlObj = new URL(window.location.href);
             urlObj.searchParams.delete('pg');
             const baseUrl = urlObj.pathname + urlObj.search;
+            
+            const postId = container.dataset.postId || 0;
             
             // Use fade out class
             if (!container.classList.contains('wg-skeleton-container')) {
@@ -785,7 +785,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     ids: items,
                     page: currentPage,
                     sort: currentSort,
-                    base_url: baseUrl
+                    base_url: baseUrl,
+                    post_id: postId
                 },
                 dataType: 'json',
                 success: function(response) {

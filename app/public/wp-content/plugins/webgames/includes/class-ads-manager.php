@@ -9,6 +9,7 @@ class Webgames_Ads_Manager {
     public function __construct() {
         add_action( 'wp_head', array( $this, 'output_global_scripts' ), 1 ); // Priority 1 to load early
         add_shortcode( 'webgames_under_player_ad', array( $this, 'render_under_player_ad' ) );
+        add_shortcode( 'webgames_archive_ad', array( $this, 'render_archive_ad' ) );
         add_shortcode( 'webgames_sidebar_ad', array( $this, 'render_sidebar_ad' ) );
     }
 
@@ -30,6 +31,21 @@ class Webgames_Ads_Manager {
         ob_start();
         ?>
         <div class="webgames-ad-container webgames-under-player-ad">
+            <?php echo do_shortcode( $code ); ?>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    public function render_archive_ad() {
+        $code = get_option( 'webgames_archive_ad_code' );
+        if ( empty( $code ) ) {
+            return '';
+        }
+        
+        ob_start();
+        ?>
+        <div class="webgames-ad-container webgames-archive-ad" style="margin-top:20px;margin-bottom:20px;text-align:center;">
             <?php echo do_shortcode( $code ); ?>
         </div>
         <?php

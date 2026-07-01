@@ -8,24 +8,84 @@
     <!-- wp:group {"tagName":"main","className":"wg-main-column","layout":{"type":"default"}} -->
     <main class="wp-block-group wg-main-column">
         
-        <!-- wp:group {"style":{"spacing":{"padding":{"top":"20px","right":"20px","bottom":"20px","left":"20px"}}},"layout":{"type":"default"}} -->
-        <div class="wp-block-group" style="padding-top:20px;padding-right:20px;padding-bottom:20px;padding-left:20px">
-            
-            <!-- wp:post-title {"level":1} /-->
-            
-            <!-- wp:post-featured-image {"style":{"spacing":{"margin":{"bottom":"20px"}}}} /-->
-            
-            <!-- wp:post-content {"layout":{"type":"constrained"}} /-->
-            
-            <!-- wp:group {"style":{"spacing":{"padding":{"top":"var:preset|spacing|40","bottom":"var:preset|spacing|40"}}},"layout":{"type":"constrained"}} -->
-            <div class="wp-block-group" style="padding-top:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--40)">
-                <!-- wp:post-terms {"term":"category","separator":"  "} /-->
-                <!-- wp:post-terms {"term":"post_tag","separator":"  "} /-->
+        <!-- Top Ad Placeholder -->
+        <!-- wp:group {"style":{"spacing":{"margin":{"bottom":"20px","top":"20px"}}},"layout":{"type":"default"}} -->
+        <div class="wp-block-group" style="margin-top:20px;margin-bottom:20px;text-align:center;">
+            <!-- wp:shortcode -->
+            [webgames_archive_ad]
+            <!-- /wp:shortcode -->
+        </div>
+        <!-- /wp:group -->
+
+        <!-- wp:group {"style":{"spacing":{"padding":{"right":"20px","left":"20px"}}},"layout":{"type":"default"}} -->
+        <div class="wp-block-group" style="padding-right:20px;padding-left:20px">
+            <!-- wp:columns {"align":"wide"} -->
+            <div class="wp-block-columns alignwide">
+                
+                <!-- wp:column -->
+                <div class="wp-block-column">
+                    
+                    <!-- wp:group {"className":"wg-content-section","layout":{"type":"constrained"}} -->
+                    <div class="wp-block-group wg-content-section">
+                        
+                        <!-- wp:shortcode -->
+                        [webgames_breadcrumbs]
+                        <!-- /wp:shortcode -->
+
+                        <!-- wp:post-title {"level":1,"style":{"spacing":{"margin":{"bottom":"10px","top":"0px"}}}} /-->
+                        
+                        <!-- wp:group {"layout":{"type":"flex","flexWrap":"wrap","justifyContent":"left","gap":"15px"},"style":{"spacing":{"margin":{"bottom":"20px"}},"color":{"text":"#a4b0be"}}} -->
+                        <div class="wp-block-group has-text-color" style="color:#a4b0be;margin-bottom:20px;">
+                            <!-- wp:post-author-name {"isLink":true} /-->
+                            <!-- wp:post-date /-->
+                        </div>
+                        <!-- /wp:group -->
+                        
+                        <!-- wp:post-featured-image {"style":{"spacing":{"margin":{"bottom":"20px"}}}} /-->
+                        
+                        <!-- wp:post-content {"layout":{"type":"constrained"}} /-->
+                        
+                        <!-- wp:group {"style":{"spacing":{"padding":{"top":"20px","bottom":"20px"}}},"layout":{"type":"constrained"}} -->
+                        <div class="wp-block-group" style="padding-top:20px;padding-bottom:20px">
+                            <!-- wp:post-terms {"term":"category","prefix":"Categories: ","separator":", ","className":"is-style-default"} /-->
+                            <!-- wp:post-terms {"term":"post_tag","prefix":"Tags: ","separator":", ","className":"is-style-default"} /-->
+                        </div>
+                        <!-- /wp:group -->
+                        
+                        <!-- wp:html -->
+                        <hr class="wg-custom-separator" style="background-color:rgba(255, 255, 255, 0.08); margin-top:10px; margin-bottom:20px; border:none; height:1px;"/>
+                        <!-- /wp:html -->
+                        
+                        <!-- wp:shortcode -->
+                        [webgames_page_share]
+                        <!-- /wp:shortcode -->
+
+                    </div>
+                    <!-- /wp:group -->
+                    
+                    <!-- wp:group {"className":"wg-content-section","style":{"spacing":{"margin":{"top":"20px"}}},"layout":{"type":"constrained"}} -->
+                    <div class="wp-block-group wg-content-section" style="margin-top:20px">
+                        <!-- wp:comments /-->
+                    </div>
+                    <!-- /wp:group -->
+
+                </div>
+                <!-- /wp:column -->
+
+                <!-- wp:column {"width":"325px"} -->
+                <div class="wp-block-column" style="flex-basis:325px">
+                    <!-- wp:heading {"level":3,"className":"screen-reader-text"} -->
+                    <h3 class="wp-block-heading screen-reader-text">Related Games</h3>
+                    <!-- /wp:heading -->
+
+                    <!-- wp:shortcode -->
+                    [webgames_sidebar_list posts_per_page="10" ad_after="4"]
+                    <!-- /wp:shortcode -->
+                </div>
+                <!-- /wp:column -->
+
             </div>
-            <!-- /wp:group -->
-            
-            <!-- wp:comments /-->
-            
+            <!-- /wp:columns -->
         </div>
         <!-- /wp:group -->
         

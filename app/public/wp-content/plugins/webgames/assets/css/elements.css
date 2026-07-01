@@ -1,7 +1,10 @@
 /* Global Elements CSS for Webgames */
 /* AI MUST update this file when introducing new common UI elements like buttons, forms, badges */
-
 /* Badges / Labels */
+html {
+    overflow-x: hidden;
+}
+
 .wg-label {
     display: inline-block;
     padding: 2px 6px;
@@ -67,7 +70,8 @@ select:focus,
 
 ::placeholder {
     color: var(--m3-on-surface-variant, #C4C7C5);
-    opacity: 1; /* Override Firefox default opacity */
+    opacity: 1;
+    /* Override Firefox default opacity */
 }
 
 /* Maintain backward compatibility for custom form classes */
@@ -138,7 +142,8 @@ select:focus,
     width: 100vw;
     height: calc(100vh - var(--wg-header-height));
     background: rgba(0, 0, 0, 0.5);
-    z-index: 98; /* Below sidebar's 99 */
+    z-index: 98;
+    /* Below sidebar's 99 */
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -274,6 +279,7 @@ select:focus,
 
 /* Handle WP Admin Bar (Mobile & Tablet Portrait) */
 @media screen and (max-width: 782px) {
+
     /* Force Admin bar to be fixed to prevent layout gaps when scrolling */
     #wpadminbar {
         position: fixed !important;
@@ -281,7 +287,8 @@ select:focus,
     }
 
     body.admin-bar .wp-block-template-part:has(.wg-top-header) {
-        top: 46px; /* Admin bar height on mobile */
+        top: 46px;
+        /* Admin bar height on mobile */
     }
 
     body.admin-bar .wg-sidebar-vertical,
@@ -303,7 +310,7 @@ ul.wg-cat-menu.wg-discover-menu {
     margin-bottom: 0 !important;
 }
 
-ul.wp-block-navigation__container.wg-cat-menu.wg-discover-menu.wp-block-navigation {
+nav.wp-block-navigation.wg-cat-menu.wg-discover-menu ul.wp-block-navigation__container {
     position: relative;
     margin-top: 16px !important;
     padding-top: 16px !important;
@@ -312,8 +319,8 @@ ul.wp-block-navigation__container.wg-cat-menu.wg-discover-menu.wp-block-navigati
     gap: 0 !important;
 }
 
-ul.wp-block-navigation__container.wg-cat-menu.wg-discover-menu.wp-block-navigation::before,
-ul.wp-block-navigation__container.wg-cat-menu.wg-discover-menu.wp-block-navigation::after {
+nav.wp-block-navigation.wg-cat-menu.wg-discover-menu ul.wp-block-navigation__container::before,
+nav.wp-block-navigation.wg-cat-menu.wg-discover-menu ul.wp-block-navigation__container::after {
     content: '';
     position: absolute;
     left: 16px;
@@ -323,11 +330,11 @@ ul.wp-block-navigation__container.wg-cat-menu.wg-discover-menu.wp-block-navigati
     /* M3 Outline Variant */
 }
 
-ul.wp-block-navigation__container.wg-cat-menu.wg-discover-menu.wp-block-navigation::before {
+nav.wp-block-navigation.wg-cat-menu.wg-discover-menu ul.wp-block-navigation__container::before {
     top: 0;
 }
 
-ul.wp-block-navigation__container.wg-cat-menu.wg-discover-menu.wp-block-navigation::after {
+nav.wp-block-navigation.wg-cat-menu.wg-discover-menu ul.wp-block-navigation__container::after {
     bottom: 0;
 }
 
@@ -363,6 +370,12 @@ ul.wp-block-navigation__container.wg-cat-menu.wg-discover-menu.wp-block-navigati
     color: #fff !important;
 }
 
+.wg-sidebar-vertical .wg-cat-menu li.active a,
+.wg-sidebar-vertical .wp-block-navigation-item.current-menu-item>.wp-block-navigation-item__content {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #fff !important;
+}
+
 .wg-sidebar-vertical .wg-cat-menu li a .dashicons,
 .wg-sidebar-vertical .wp-block-navigation-item__content .dashicons {
     color: #CAC4D0;
@@ -372,6 +385,11 @@ ul.wp-block-navigation__container.wg-cat-menu.wg-discover-menu.wp-block-navigati
 
 .wg-sidebar-vertical .wg-cat-menu li a:hover .dashicons,
 .wg-sidebar-vertical .wp-block-navigation-item__content:hover .dashicons {
+    color: #fff;
+}
+
+.wg-sidebar-vertical .wg-cat-menu li.active a .dashicons,
+.wg-sidebar-vertical .wp-block-navigation-item.current-menu-item>.wp-block-navigation-item__content .dashicons {
     color: #fff;
 }
 
@@ -627,14 +645,14 @@ ul.wp-block-navigation__container.wg-cat-menu.wg-discover-menu.wp-block-navigati
    GAME SLIDER SECTIONS
    ========================================== */
 .wg-slider-section {
-    margin-bottom: 40px;
-    padding-bottom: 10px;
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 
 .wg-section-header {
     display: flex;
     justify-content: flex-start;
-    align-items: baseline;
+    align-items: flex-end;
     /* Align bottom to look natural next to larger text */
     gap: 15px;
     margin-bottom: 15px;
@@ -817,4 +835,18 @@ ul.wp-block-navigation__container.wg-cat-menu.wg-discover-menu.wp-block-navigati
 /* Ẩn các thẻ p tự sinh rỗng do wpautop của WordPress gây ra */
 .wg-sidebar-thumb-container p:empty {
     display: none !important;
+}
+
+/* Center Ads */
+.webgames-under-player-ad {
+    text-align: center;
+}
+
+/* AJAX Fade Animations */
+.wg-fade-content {
+    transition: opacity 0.3s ease;
+}
+
+.wg-fade-out {
+    opacity: 0.3;
 }

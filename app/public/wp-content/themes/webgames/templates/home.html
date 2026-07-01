@@ -8,45 +8,57 @@
     <!-- wp:group {"tagName":"main","className":"wg-main-column","layout":{"type":"default"}} -->
     <main class="wp-block-group wg-main-column">
         
-<!-- wp:group {"style":{"spacing":{"padding":{"top":"20px","right":"20px","bottom":"20px","left":"20px"}}},"layout":{"type":"default"}} -->
-<div class="wp-block-group" style="padding-top:20px;padding-right:20px;padding-bottom:20px;padding-left:20px">
-<!-- wp:shortcode -->
-[webgames_game_slider title="Most played games" icon="dashicons-chart-bar" sort="popular" count="12"]
-<!-- /wp:shortcode -->
+        <!-- Top Ad Placeholder -->
+        <!-- wp:group {"style":{"spacing":{"margin":{"bottom":"20px","top":"20px"}}},"layout":{"type":"default"}} -->
+        <div class="wp-block-group" style="margin-top:20px;margin-bottom:20px;text-align:center;">
+            <!-- wp:shortcode -->
+            [webgames_archive_ad]
+            <!-- /wp:shortcode -->
+        </div>
+        <!-- /wp:group -->
 
-<!-- wp:shortcode -->
-[webgames_game_slider title="Recently Played" icon="dashicons-backup" sort="recent" count="12"]
-<!-- /wp:shortcode -->
+        <!-- wp:group {"style":{"spacing":{"padding":{"right":"20px","left":"20px"}}},"layout":{"type":"default"}} -->
+        <div class="wp-block-group" style="padding-right:20px;padding-left:20px">
+            
+            <!-- wp:group {"className":"wg-content-section","style":{"spacing":{"margin":{"bottom":"20px"}}},"layout":{"type":"constrained"}} -->
+            <div class="wp-block-group wg-content-section" style="margin-bottom:20px">
+                <!-- wp:shortcode -->
+                [webgames_breadcrumbs]
+                <!-- /wp:shortcode -->
 
-<!-- wp:shortcode -->
-[webgames_game_slider title="New Games" icon="dashicons-star-filled" sort="new" count="12"]
-<!-- /wp:shortcode -->
+                <!-- wp:post-title {"level":1,"style":{"spacing":{"margin":{"top":"0px"}}}} /-->
+            </div>
+            <!-- /wp:group -->
+            
+            <!-- wp:query {"queryId":1,"query":{"perPage":24,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true}} -->
+            <div class="wp-block-query">
+                <!-- wp:post-template {"layout":{"type":"grid","columnCount":4}} -->
+                
+                <!-- wp:group {"style":{"border":{"radius":"12px"},"color":{"background":"#111418"}},"layout":{"type":"default"}} -->
+                <div class="wp-block-group has-background" style="background-color:#111418;border-radius:12px;overflow:hidden">
+                    <!-- wp:post-featured-image {"isLink":true,"aspectRatio":"16/9"} /-->
+                    
+                    <!-- wp:group {"style":{"spacing":{"padding":{"top":"15px","right":"15px","bottom":"15px","left":"15px"}}},"layout":{"type":"default"}} -->
+                    <div class="wp-block-group" style="padding-top:15px;padding-right:15px;padding-bottom:15px;padding-left:15px">
+                        <!-- wp:post-title {"isLink":true,"level":3,"style":{"typography":{"fontSize":"16px","fontWeight":"600"},"spacing":{"margin":{"top":"0","bottom":"10px"}}}} /-->
+                        <!-- wp:post-excerpt {"moreText":"Read more","style":{"typography":{"fontSize":"14px"}}} /-->
+                    </div>
+                    <!-- /wp:group -->
+                </div>
+                <!-- /wp:group -->
 
-<!-- wp:shortcode -->
-[webgames_game_slider title="Hot Games" icon="dashicons-megaphone" sort="hot" count="12"]
-<!-- /wp:shortcode -->
+                <!-- /wp:post-template -->
 
-<!-- wp:shortcode -->
-[webgames_game_slider title="Best Rating" icon="dashicons-awards" sort="rating" count="12"]
-<!-- /wp:shortcode -->
-
-<!-- wp:shortcode -->
-[webgames_home_ad]
-<!-- /wp:shortcode -->
-
-<!-- wp:shortcode -->
-[webgames_game_slider title="Action Games" icon="dashicons-shield" sort="category" category_slug="action" count="12"]
-<!-- /wp:shortcode -->
-</div>
-<!-- /wp:group -->
-
-<!-- wp:group {"className":"wg-auto-expandable","layout":{"type":"constrained"}} -->
-<div class="wp-block-group wg-auto-expandable">
-<!-- wp:paragraph {"style":{"color":{"text":"#d2dae2"},"typography":{"fontSize":"15px","lineHeight":"1.6"}}} -->
-<p style="color:#d2dae2;font-size:15px;line-height:1.6">Welcome to our ultimate game portal! Here you can play the best HTML5 games for free. Dive into an amazing world of action, puzzle, arcade, and adventure games. All games are carefully selected to provide you with the best gaming experience without downloading anything. Enjoy endless fun right in your browser!</p>
-<!-- /wp:paragraph -->
-</div>
-<!-- /wp:group -->
+                <!-- wp:query-pagination {"paginationArrow":"arrow","layout":{"type":"flex","justifyContent":"center"}} -->
+                <!-- wp:query-pagination-previous /-->
+                <!-- wp:query-pagination-numbers /-->
+                <!-- wp:query-pagination-next /-->
+                <!-- /wp:query-pagination -->
+            </div>
+            <!-- /wp:query -->
+            
+        </div>
+        <!-- /wp:group -->
         
         <!-- wp:template-part {"slug":"footer"} /-->
         
