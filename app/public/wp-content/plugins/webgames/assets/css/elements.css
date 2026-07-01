@@ -850,3 +850,7 @@ nav.wp-block-navigation.wg-cat-menu.wg-discover-menu ul.wp-block-navigation__con
 .wg-fade-out {
     opacity: 0.3;
 }
+/* Failsafe to prevent Gutenberg from double-padding wg-box-dark */
+.wg-box-dark.has-global-padding {
+    padding: 20px !important;
+}

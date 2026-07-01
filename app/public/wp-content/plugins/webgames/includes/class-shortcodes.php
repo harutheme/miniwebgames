@@ -31,6 +31,7 @@ class Webgames_Shortcodes {
         add_shortcode( 'webgames_game_slider', array( $this, 'game_slider_shortcode' ) );
         add_shortcode( 'webgames_home_ad', array( $this, 'home_ad_shortcode' ) );
         add_shortcode( 'webgames_page_share', array( $this, 'page_share_shortcode' ) );
+        add_shortcode( 'webgames_dynamic_title', array( $this, 'dynamic_title_shortcode' ) );
 
         // Magic tag filter for icon
         add_filter( 'render_block_core/navigation-link', array( $this, 'filter_nav_link_icon' ), 10, 2 );
@@ -1788,5 +1789,27 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
         <?php
         $html = ob_get_clean();
         return str_replace( array( "\r\n", "\r", "\n", "\t" ), '', $html );
+    }
+
+    /**
+     * Dynamic Title Shortcode
+     * Properly resolves titles for the blog index, archives, search, and standard pages
+     * safely escaping output to be used directly in templates.
+     */
+    public function dynamic_title_shortcode( $atts ) {
+        if ( is_home() && get_option( 'page_for_posts' ) ) {
+            // Blog index page
+            $title = get_the_title( get_option( 'page_for_posts' ) );
+        } elseif ( is_archive() ) {
+            $title = get_the_archive_title();
+            // Clean up standard WP archive prefixes (e.g. "Category: ")
+            $title = preg_replace( '/^.*: /', '', wp_strip_all_tags( $title ) );
+        } elseif ( is_search() ) {
+            $title = sprintf( __( 'Search Results for "%s"', 'webgames' ), get_search_query() );
+        } else {
+            $title = get_the_title();
+        }
+
+        return '<h1 class="wp-block-heading wg-page-title" style="margin-top:0px">' . esc_html( $title ) . '</h1>';
     }
 }
