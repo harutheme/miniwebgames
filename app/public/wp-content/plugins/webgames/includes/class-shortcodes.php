@@ -384,8 +384,8 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
             if ( $image_id ) {
                 $image_url = wp_get_attachment_image_url( $image_id, 'thumbnail' );
                 if ( $image_url ) {
-                    // Inline styles to ensure it aligns nicely with text
-                    $icon_html = '<img src="' . esc_url( $image_url ) . '" alt="' . esc_attr( $term->name ) . '" class="wg-cat-icon-img" style="width:18px; height:18px; vertical-align:text-bottom; margin-right:5px; border-radius:3px;" />';
+                    // Removed inline styles to let CSS handle it
+                    $icon_html = '<img src="' . esc_url( $image_url ) . '" alt="' . esc_attr( $term->name ) . '" class="wg-cat-icon-img" />';
                 }
             }
             

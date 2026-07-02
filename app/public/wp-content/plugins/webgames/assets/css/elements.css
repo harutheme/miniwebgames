@@ -454,6 +454,21 @@ nav.wp-block-navigation.wg-cat-menu.wg-discover-menu ul.wp-block-navigation__con
     flex-shrink: 0;
 }
 
+.wg-sidebar-vertical .wg-cat-menu .wg-cat-icon-wrapper img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain; /* Ensure image isn't distorted */
+}
+
+.wg-sidebar-vertical .wg-cat-menu .wg-cat-icon-wrapper .dashicons {
+    width: 24px;
+    height: 24px;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* Unified Sidebar Structure (Desktop & Tablet) */
 @media (min-width: 992px) {
 

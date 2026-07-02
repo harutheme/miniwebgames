@@ -522,9 +522,10 @@
 }
 
 /* Thu nhỏ nội dung bài viết cho phù hợp với Title */
-.wg-content-section .wp-block-post-content,
-.wg-content-section .wp-block-post-content p,
-.wg-content-section .wp-block-post-content li {
+.wg-main-column .wg-content-section .wp-block-post-content,
+.wg-main-column .wg-content-section .wp-block-post-content p,
+.wg-main-column .wg-content-section .wp-block-post-content li,
+.wg-main-column .wg-content-section .wp-block-post-content .has-text-color {
     font-size: clamp(0.8rem, 1.5vw + 0.4rem, 0.9rem) !important;
     line-height: 1.6;
     color: var(--wg-text-muted); /* Áp dụng màu xanh xám dịu mắt */
