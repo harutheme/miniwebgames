@@ -528,7 +528,8 @@
 .wg-main-column .wg-content-section .wp-block-post-content .has-text-color {
     font-size: clamp(0.8rem, 1.5vw + 0.4rem, 0.9rem) !important;
     line-height: 1.6;
-    color: var(--wg-text-muted); /* Áp dụng màu xanh xám dịu mắt */
+    color: var(--wg-text-muted);
+    /* Áp dụng màu xanh xám dịu mắt */
 }
 
 /* Đảm bảo các thẻ tiêu đề bên trong nội dung vẫn sáng để tạo phân cấp */
@@ -598,29 +599,60 @@
 }
 
 /* Mobile Responsive */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .wg-related-grid {
-        display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    /* Stack toolbar into 2 rows on mobile */
+    .webgames-toolbar {
+        flex-direction: column;
         gap: 15px;
-        padding-bottom: 10px;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        /* Firefox */
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+    
+    .wg-toolbar-right {
+        width: 100%;
+        justify-content: space-between; /* Spread buttons evenly */
     }
 
-    .wg-related-grid::-webkit-scrollbar {
+    /* Hide cover title on small mobile screens to save space */
+    .wg-cover-title {
         display: none;
-        /* Chrome/Safari */
-    }
-
-    .wg-related-item {
-        flex: 0 0 160px;
-        /* Fixed width for mobile horizontal scroll */
-        scroll-snap-align: start;
     }
 }
+
+/* ==========================================
+   TABLET RESPONSIVE OVERRIDE (For Game Layout)
+   ========================================== */
+@media (max-width: 991px) {
+    /* Force Gutenberg columns to stack earlier than the WP default 781px */
+    .wg-main-column .wp-block-columns {
+        flex-wrap: wrap !important;
+    }
+    
+    .wg-main-column .wp-block-columns > .wp-block-column {
+        flex-basis: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        margin-bottom: 20px;
+    }
+
+    /* Ad-Safe Sidebar Grid: Must be a divisor of 4 to avoid orphaned cards before the Ad */
+    .webgames-sidebar-list {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Mobile fallback for Sidebar Ad-Safe Grid */
+@media (max-width: 767px) {
+    .webgames-sidebar-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 
 /* ==========================================
    ARCHIVE / CATEGORY / TAG LAYOUT
@@ -952,6 +984,14 @@
     border-radius: 8px;
 }
 
+.wg-bottom-seo p,
+.wg-bottom-seo ol,
+.wg-bottom-seo li {
+    font-size: clamp(0.8rem, 1.5vw + 0.4rem, 0.9rem) !important;
+    line-height: 1.6;
+    color: var(--wg-text-muted);
+}
+
 /* ==========================================
    FULLSCREEN MODE (OPTION 2)
    ========================================== */
@@ -1114,4 +1154,30 @@ body.dark-mode .wg-tag-grid li a:hover {
 
 .wg-tag-grid li a:hover .wg-tag-count {
     color: #FF4757;
+}
+
+/* ==========================================
+   IOS PSEUDO-FULLSCREEN FALLBACK
+   ========================================== */
+.wg-pseudo-fullscreen-body {
+    overflow: hidden !important;
+}
+
+.wg-pseudo-fullscreen {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 999999 !important;
+    background: #000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+}
+
+.wg-pseudo-fullscreen iframe {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
 }

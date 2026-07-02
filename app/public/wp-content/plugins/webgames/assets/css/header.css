@@ -258,7 +258,7 @@
     color: var(--m3-on-surface-variant);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .wg-top-header {
         padding: 0 8px;
     }

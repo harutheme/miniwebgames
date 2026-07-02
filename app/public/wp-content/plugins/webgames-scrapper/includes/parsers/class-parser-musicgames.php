@@ -25,6 +25,23 @@ class Webgames_Parser_Musicgames implements Webgames_Scraper_Parser_Interface {
     }
 
     public function get_description() {
+        // Priority 1: Extract full HTML description from the game_content div
+        $nodes = $this->xpath->query('//div[contains(@class, "game_content")]');
+        if ( $nodes->length > 0 ) {
+            $node = $nodes->item(0);
+            $innerHTML = '';
+            $children = $node->childNodes;
+            foreach ($children as $child) {
+                // Remove unwanted scripts or styles if necessary, but saveHTML is safe for block content
+                $innerHTML .= $node->ownerDocument->saveHTML($child);
+            }
+            $innerHTML = trim($innerHTML);
+            if ( ! empty( $innerHTML ) ) {
+                return $innerHTML;
+            }
+        }
+
+        // Priority 2: Fallback to og:description meta tag
         $nodes = $this->xpath->query('//meta[@property="og:description"]/@content');
         return $nodes->length > 0 ? $nodes->item(0)->nodeValue : '';
     }

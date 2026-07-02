@@ -13,6 +13,7 @@ class Webgames_Single_Scraper {
         add_action( 'add_meta_boxes', array( $this, 'add_scraper_meta_box' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
         add_action( 'wp_ajax_webgames_scrape_url', array( $this, 'handle_scrape_ajax' ) );
+        add_action( 'save_post_game', array( $this, 'save_scraper_meta' ) );
     }
 
     public function add_scraper_meta_box() {
@@ -41,8 +42,25 @@ class Webgames_Single_Scraper {
                 <?php esc_html_e( 'Fetch Game Data', 'webgames-scrapper' ); ?>
             </button>
             <div id="wg-scraper-status" class="wg-status-msg"></div>
+
+            <?php $existing_source = get_post_meta( $post->ID, '_wg_scraped_source_url', true ); ?>
+            <?php if ( $existing_source ) : ?>
+                <p class="description" style="margin-top:10px; font-size:12px; color:#666;">
+                    <?php printf( __( 'Previously scraped from: <a href="%s" target="_blank" style="text-decoration:none;">Link</a>', 'webgames-scrapper' ), esc_url( $existing_source ) ); ?>
+                </p>
+            <?php endif; ?>
+            <input type="hidden" id="wg_scraped_source_url" name="wg_scraped_source_url" value="<?php echo esc_attr( $existing_source ); ?>" />
         </div>
         <?php
+    }
+
+    public function save_scraper_meta( $post_id ) {
+        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
+        if ( ! current_user_can( 'edit_post', $post_id ) ) return;
+        
+        if ( isset( $_POST['wg_scraped_source_url'] ) && ! empty( $_POST['wg_scraped_source_url'] ) ) {
+            update_post_meta( $post_id, '_wg_scraped_source_url', esc_url_raw( $_POST['wg_scraped_source_url'] ) );
+        }
     }
 
     public function enqueue_assets( $hook ) {
@@ -110,7 +128,29 @@ class Webgames_Single_Scraper {
             'image_url'   => $parser->get_image_url(),
             'image_id'    => '',
             'iframe_url'  => $parser->get_iframe_url(),
+            'source_url'  => $url, // Pass back to JS for tracking
         );
+
+        // Duplicate Check based on Iframe URL
+        if ( ! empty( $data['iframe_url'] ) ) {
+            $existing_games = get_posts( array(
+                'post_type'  => 'game',
+                'meta_key'   => 'iframe_url',
+                'meta_value' => $data['iframe_url'],
+                'fields'     => 'ids',
+                'numberposts'=> 1,
+            ) );
+
+            if ( ! empty( $existing_games ) ) {
+                $existing_id = $existing_games[0];
+                $edit_url = get_edit_post_link( $existing_id, 'raw' );
+                $error_msg = sprintf(
+                    __( 'Duplicate! This game already exists in the system. <a href="%s" target="_blank" style="text-decoration:underline;">Click here to edit it</a>.', 'webgames-scrapper' ),
+                    esc_url( $edit_url )
+                );
+                wp_send_json_error( $error_msg );
+            }
+        }
 
         // Sideload image if available
         if ( ! empty( $data['image_url'] ) ) {

@@ -95,9 +95,13 @@ jQuery(document).ready(function($) {
                             // We can also trigger a visual update if needed, but usually save is enough
                         }
                     }
+                    // Set wg_scraped_source_url for tracking
+                    if (data.source_url) {
+                        $('#wg_scraped_source_url').val(data.source_url);
+                    }
 
                 } else {
-                    $statusMsg.addClass('wg-status-error').text(wgScraperAjax.error + ' ' + response.data);
+                    $statusMsg.addClass('wg-status-error').html('<strong>' + wgScraperAjax.error + '</strong><br>' + response.data);
                 }
             },
             error: function() {

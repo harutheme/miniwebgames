@@ -196,7 +196,7 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
                     </div>
                 </div>
                 <div class="wg-iframe-wrapper">
-                    <iframe id="webgames-iframe" class="webgames-iframe" src="" frameborder="0" scrolling="no" allowfullscreen></iframe>
+                    <iframe id="webgames-iframe" class="webgames-iframe" src="" frameborder="0" scrolling="no" allowfullscreen allow="autoplay; fullscreen; microphone; clipboard-read; clipboard-write"></iframe>
                 </div>
             </div>
 
@@ -1449,6 +1449,21 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
             }
         }
 
+        // Determine Icon HTML
+        $icon_html = '<span class="dashicons ' . esc_attr( $icon ) . '"></span>';
+        if ( $sort === 'category' && ! empty( $category_slug ) ) {
+            $term = get_term_by( 'slug', $category_slug, 'game-category' );
+            if ( $term && ! is_wp_error( $term ) ) {
+                $image_id = get_term_meta( $term->term_id, 'wg_category_image', true );
+                if ( $image_id ) {
+                    $image_url = wp_get_attachment_image_url( $image_id, 'thumbnail' );
+                    if ( $image_url ) {
+                        $icon_html = '<img src="' . esc_url( $image_url ) . '" alt="' . esc_attr( $term->name ) . '" class="wg-slider-cat-img" />';
+                    }
+                }
+            }
+        }
+
         ob_start();
         $slider_id = 'wg-slider-' . uniqid();
 
@@ -1457,7 +1472,7 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
             ?>
             <div class="wg-slider-section wg-recent-slider-section" id="<?php echo esc_attr( $slider_id ); ?>-section" style="display: none;">
                 <div class="wg-section-header">
-                    <h2 class="wg-section-title"><span class="dashicons <?php echo esc_attr( $icon ); ?>"></span> <?php echo $title; ?></h2>
+                    <h2 class="wg-section-title"><?php echo $icon_html; ?> <?php echo $title; ?></h2>
                     <?php if ( $view_more_link ) : ?>
                     <div class="wg-view-more-wrap">
                         <a href="<?php echo esc_url( $view_more_link ); ?>" class="wg-view-more"><?php _e('View more', 'webgames'); ?> <span class="dashicons dashicons-arrow-right-alt2"></span></a>
@@ -1516,7 +1531,7 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
         ?>
         <div class="wg-slider-section">
             <div class="wg-section-header">
-                <h2 class="wg-section-title"><span class="dashicons <?php echo esc_attr( $icon ); ?>"></span> <?php echo $title; ?></h2>
+                <h2 class="wg-section-title"><?php echo $icon_html; ?> <?php echo $title; ?></h2>
                 <?php if ( $view_more_link ) : ?>
                 <div class="wg-view-more-wrap"> 
                     <a href="<?php echo esc_url( $view_more_link ); ?>" class="wg-view-more"><?php _e('View more', 'webgames'); ?> <span class="dashicons dashicons-arrow-right-alt2"></span></a>

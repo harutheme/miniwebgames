@@ -53,24 +53,51 @@ document.addEventListener('DOMContentLoaded', function() {
     const canvasContainer = document.getElementById('webgames-canvas-container');
 
     if (fsBtn && canvasContainer) {
+        // Pseudo-fullscreen toggle function
+        const togglePseudoFullscreen = (enable) => {
+            if (enable) {
+                canvasContainer.classList.add('wg-pseudo-fullscreen');
+                document.body.classList.add('wg-pseudo-fullscreen-body');
+                if (exitFsBtn) exitFsBtn.style.display = 'flex';
+            } else {
+                canvasContainer.classList.remove('wg-pseudo-fullscreen');
+                document.body.classList.remove('wg-pseudo-fullscreen-body');
+                if (exitFsBtn) exitFsBtn.style.display = 'none';
+            }
+        };
+
         fsBtn.addEventListener('click', function() {
             if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                 if (canvasContainer.requestFullscreen) {
                     canvasContainer.requestFullscreen().catch(err => {
-                        console.warn(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                        console.warn(`Native fullscreen failed: ${err.message}. Falling back to pseudo-fullscreen.`);
+                        togglePseudoFullscreen(true);
                     });
                 } else if (canvasContainer.webkitRequestFullscreen) {
                     canvasContainer.webkitRequestFullscreen();
+                    // Check if native fullscreen succeeded, if not, fallback (iOS specific)
+                    setTimeout(() => {
+                        if (!document.webkitFullscreenElement) {
+                            togglePseudoFullscreen(true);
+                        }
+                    }, 200);
+                } else {
+                    // No native support at all
+                    togglePseudoFullscreen(true);
                 }
             }
         });
 
         if (exitFsBtn) {
             exitFsBtn.addEventListener('click', function() {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
+                if (canvasContainer.classList.contains('wg-pseudo-fullscreen')) {
+                    togglePseudoFullscreen(false);
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    }
                 }
             });
         }
@@ -79,7 +106,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (document.fullscreenElement || document.webkitFullscreenElement) {
                 if (exitFsBtn) exitFsBtn.style.display = 'flex';
             } else {
-                if (exitFsBtn) exitFsBtn.style.display = 'none';
+                if (exitFsBtn && !canvasContainer.classList.contains('wg-pseudo-fullscreen')) {
+                    exitFsBtn.style.display = 'none';
+                }
             }
         };
 

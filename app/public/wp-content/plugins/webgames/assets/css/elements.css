@@ -26,8 +26,8 @@ html {
 }
 
 .wg-label-new {
-    background: linear-gradient(45deg, #2ed573, #7bed9f);
-    box-shadow: 0 0 5px rgba(46, 213, 115, 0.5);
+    background: linear-gradient(45deg, #3eb752, #58d16b);
+    box-shadow: 0 0 5px rgba(62, 183, 82, 0.5);
 }
 
 /* Forms Elements - Global Synchronized Styles */
@@ -457,7 +457,8 @@ nav.wp-block-navigation.wg-cat-menu.wg-discover-menu ul.wp-block-navigation__con
 .wg-sidebar-vertical .wg-cat-menu .wg-cat-icon-wrapper img {
     width: 28px;
     height: 28px;
-    object-fit: contain; /* Ensure image isn't distorted */
+    object-fit: contain;
+    /* Ensure image isn't distorted */
 }
 
 .wg-sidebar-vertical .wg-cat-menu .wg-cat-icon-wrapper .dashicons {
@@ -649,7 +650,7 @@ nav.wp-block-navigation.wg-cat-menu.wg-discover-menu ul.wp-block-navigation__con
 }
 
 /* Mobile adjust */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .wg-btn-back-to-top {
         bottom: 20px;
         right: 20px;
@@ -685,6 +686,13 @@ nav.wp-block-navigation.wg-cat-menu.wg-discover-menu ul.wp-block-navigation__con
 
 .wg-section-title .dashicons {
     color: #ff4757;
+}
+
+.wg-section-title img.wg-slider-cat-img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    border-radius: 4px;
 }
 
 .wg-view-more {
@@ -791,7 +799,7 @@ nav.wp-block-navigation.wg-cat-menu.wg-discover-menu ul.wp-block-navigation__con
 
 /* Cards inside slider */
 .wg-game-slider .wg-game-card {
-    flex: 0 0 calc((100% / 7.5) - 15px);
+    flex: 0 0 calc((100% / 6.25) - 15px);
     scroll-snap-align: start;
     min-width: 120px;
 }
@@ -799,25 +807,25 @@ nav.wp-block-navigation.wg-cat-menu.wg-discover-menu ul.wp-block-navigation__con
 /* Responsive Breakpoints */
 @media (max-width: 1200px) {
     .wg-game-slider .wg-game-card {
-        flex: 0 0 calc((100% / 5.5) - 15px);
+        flex: 0 0 calc((100% / 5.25) - 15px);
     }
 }
 
 @media (max-width: 992px) {
     .wg-game-slider .wg-game-card {
-        flex: 0 0 calc((100% / 4.5) - 15px);
+        flex: 0 0 calc((100% / 4.25) - 15px);
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .wg-game-slider .wg-game-card {
-        flex: 0 0 calc((100% / 3.5) - 15px);
+        flex: 0 0 calc((100% / 3.25) - 15px);
     }
 }
 
 @media (max-width: 480px) {
     .wg-game-slider .wg-game-card {
-        flex: 0 0 calc((100% / 1.5) - 15px);
+        flex: 0 0 calc((100% / 2.25) - 15px);
     }
 }
 
@@ -865,7 +873,15 @@ nav.wp-block-navigation.wg-cat-menu.wg-discover-menu ul.wp-block-navigation__con
 .wg-fade-out {
     opacity: 0.3;
 }
+
 /* Failsafe to prevent Gutenberg from double-padding wg-box-dark */
 .wg-box-dark.has-global-padding {
     padding: 20px !important;
+}
+
+
+.wp-block-comment-content {
+    font-size: clamp(0.8rem, 1.5vw + 0.4rem, 0.9rem) !important;
+    line-height: 1.6;
+    color: var(--wg-text-muted);
 }
