@@ -158,6 +158,8 @@ class Webgames_Single_Scraper {
                                 $img->removeAttribute('sizes');
                                 $has_changes = true;
                             }
+                        } else {
+                            error_log( 'Webgames Scraper Content Image Error: ' . $image_id->get_error_message() . ' URL: ' . $src );
                         }
                     }
                 }
@@ -180,6 +182,7 @@ class Webgames_Single_Scraper {
             'description' => $description,
             'image_url'   => $parser->get_image_url(),
             'image_id'    => '',
+            'image_error' => '',
             'iframe_url'  => $parser->get_iframe_url(),
             'source_url'  => $url, // Pass back to JS for tracking
         );
@@ -210,6 +213,9 @@ class Webgames_Single_Scraper {
             $image_id = $this->sideload_image_no_duplicate( $data['image_url'], $data['title'] );
             if ( ! is_wp_error( $image_id ) ) {
                 $data['image_id'] = $image_id;
+            } else {
+                $data['image_error'] = $image_id->get_error_message();
+                error_log( 'Webgames Scraper Featured Image Error: ' . $data['image_error'] . ' URL: ' . $data['image_url'] );
             }
         }
 
