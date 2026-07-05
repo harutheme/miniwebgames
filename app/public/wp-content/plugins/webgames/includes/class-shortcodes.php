@@ -1426,7 +1426,7 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
             'icon' => 'dashicons-games',
             'sort' => 'popular',
             'category_slug' => '',
-            'count' => 12,
+            'count' => 10,
         ), $atts, 'webgames_game_slider' );
 
         $title = esc_html( $atts['title'] );

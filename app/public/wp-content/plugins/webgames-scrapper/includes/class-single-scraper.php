@@ -122,9 +122,62 @@ class Webgames_Single_Scraper {
 
         $parser->set_dom( $dom, $xpath, $html );
 
+        $description = $parser->get_description();
+
+        // Sideload images inside description
+        if ( ! empty( $description ) ) {
+            set_time_limit(0); // Prevent timeout for many images
+
+            require_once( ABSPATH . 'wp-admin/includes/media.php' );
+            require_once( ABSPATH . 'wp-admin/includes/file.php' );
+            require_once( ABSPATH . 'wp-admin/includes/image.php' );
+
+            $upload_dir = wp_upload_dir();
+            $baseurl = $upload_dir['baseurl'];
+
+            libxml_use_internal_errors( true );
+            $desc_dom = new DOMDocument();
+            // Use mb_convert_encoding and a wrapper div to ensure valid HTML and correct UTF-8 handling
+            $desc_dom->loadHTML( mb_convert_encoding( '<div>' . $description . '</div>', 'HTML-ENTITIES', 'UTF-8' ), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+            
+            $images = $desc_dom->getElementsByTagName('img');
+            $has_changes = false;
+
+            foreach ( $images as $img ) {
+                $src = $img->getAttribute('src');
+                if ( ! empty( $src ) && filter_var( $src, FILTER_VALIDATE_URL ) ) {
+                    // Check if it's already on our server
+                    if ( strpos( $src, $baseurl ) === false ) {
+                        // Sideload the image without duplicating
+                        $image_id = $this->sideload_image_no_duplicate( $src, null );
+                        if ( ! is_wp_error( $image_id ) ) {
+                            $local_url = wp_get_attachment_url( $image_id );
+                            if ( $local_url ) {
+                                $img->setAttribute('src', $local_url);
+                                $img->removeAttribute('srcset');
+                                $img->removeAttribute('sizes');
+                                $has_changes = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ( $has_changes ) {
+                $new_description = '';
+                $wrapper = $desc_dom->getElementsByTagName('div')->item(0);
+                if ( $wrapper ) {
+                    foreach ( $wrapper->childNodes as $child ) {
+                        $new_description .= $desc_dom->saveHTML( $child );
+                    }
+                    $description = $new_description;
+                }
+            }
+        }
+
         $data = array(
             'title'       => $parser->get_title(),
-            'description' => $parser->get_description(),
+            'description' => $description,
             'image_url'   => $parser->get_image_url(),
             'image_id'    => '',
             'iframe_url'  => $parser->get_iframe_url(),
@@ -154,16 +207,40 @@ class Webgames_Single_Scraper {
 
         // Sideload image if available
         if ( ! empty( $data['image_url'] ) ) {
-            require_once( ABSPATH . 'wp-admin/includes/media.php' );
-            require_once( ABSPATH . 'wp-admin/includes/file.php' );
-            require_once( ABSPATH . 'wp-admin/includes/image.php' );
-            
-            $image_id = media_sideload_image( $data['image_url'], 0, $data['title'], 'id' );
+            $image_id = $this->sideload_image_no_duplicate( $data['image_url'], $data['title'] );
             if ( ! is_wp_error( $image_id ) ) {
                 $data['image_id'] = $image_id;
             }
         }
 
         wp_send_json_success( $data );
+    }
+
+    private function sideload_image_no_duplicate( $url, $title = null ) {
+        // Query to check if this URL is already downloaded
+        $existing_images = get_posts( array(
+            'post_type'  => 'attachment',
+            'post_status'=> 'inherit',
+            'meta_key'   => '_wg_original_image_url',
+            'meta_value' => esc_url_raw( $url ),
+            'fields'     => 'ids',
+            'numberposts'=> 1,
+        ) );
+
+        if ( ! empty( $existing_images ) ) {
+            return $existing_images[0];
+        }
+
+        require_once( ABSPATH . 'wp-admin/includes/media.php' );
+        require_once( ABSPATH . 'wp-admin/includes/file.php' );
+        require_once( ABSPATH . 'wp-admin/includes/image.php' );
+        
+        $image_id = media_sideload_image( $url, 0, $title, 'id' );
+        
+        if ( ! is_wp_error( $image_id ) ) {
+            update_post_meta( $image_id, '_wg_original_image_url', esc_url_raw( $url ) );
+        }
+
+        return $image_id;
     }
 }
