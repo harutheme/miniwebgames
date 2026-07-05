@@ -240,3 +240,20 @@ function webgames_disable_wpautop_globally() {
     // Đảm bảo Gutenberg không cố gắng wpautop các block cổ điển
     remove_filter( 'render_block_core/freeform', 'wpautop' );
 }
+
+// Thêm mã Google Analytics vào thẻ <head> của toàn bộ website
+add_action( 'wp_head', 'webgames_add_google_analytics', 20 );
+function webgames_add_google_analytics() {
+    // Dán toàn bộ mã <script> Google Analytics của bạn vào khoảng trống bên dưới dòng này:
+    ?>
+    <!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-1QDHLKY0XM"></script>
+	<script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+
+	gtag('config', 'G-1QDHLKY0XM');
+	</script>
+    <?php
+}
