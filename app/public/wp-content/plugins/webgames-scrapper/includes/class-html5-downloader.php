@@ -36,8 +36,12 @@ class Webgames_HTML5_Downloader {
                     <th scope="row"><label for="wg-download-source"><?php esc_html_e( 'Game Source:', 'webgames-scrapper' ); ?></label></th>
                     <td>
                         <select id="wg-download-source" class="regular-text">
-                            <option value="musicgames">musicgames.io</option>
-                            <option value="generic"><?php esc_html_e( 'Auto Detect (Generic)', 'webgames-scrapper' ); ?></option>
+                            <?php
+                            $sources = Webgames_Source_Registry::get_sources();
+                            foreach ( $sources as $key => $data ) {
+                                echo '<option value="' . esc_attr( $key ) . '">' . esc_html( $data['label'] ) . '</option>';
+                            }
+                            ?>
                         </select>
                     </td>
                 </tr>
@@ -68,6 +72,8 @@ class Webgames_HTML5_Downloader {
                 'packing'  => __( 'Scraping and packing ZIP... this may take a minute.', 'webgames-scrapper' ),
                 'success'  => __( 'ZIP created! Downloading...', 'webgames-scrapper' ),
                 'error'    => __( 'Error generating ZIP.', 'webgames-scrapper' ),
+                'domain_err'=> __( 'Lỗi: URL nhập vào không thuộc hệ thống của Game Source đã chọn!', 'webgames-scrapper' ),
+                'sources'  => Webgames_Source_Registry::get_sources(),
             ) );
         }
     }
@@ -84,6 +90,19 @@ class Webgames_HTML5_Downloader {
         
         if ( empty( $url ) ) {
             wp_send_json_error( __( 'Invalid URL.', 'webgames-scrapper' ) );
+        }
+
+        // Validate domain based on registry
+        $sources = Webgames_Source_Registry::get_sources();
+        if ( ! isset( $sources[ $source ] ) ) {
+            wp_send_json_error( __( 'Invalid Game Source.', 'webgames-scrapper' ) );
+        }
+
+        $source_info = $sources[ $source ];
+        if ( ! empty( $source_info['domain'] ) ) {
+            if ( stripos( $url, $source_info['domain'] ) === false ) {
+                wp_send_json_error( __( 'Lỗi: URL nhập vào không thuộc hệ thống của Game Source đã chọn!', 'webgames-scrapper' ) );
+            }
         }
 
         if ( ! class_exists( 'ZipArchive' ) ) {

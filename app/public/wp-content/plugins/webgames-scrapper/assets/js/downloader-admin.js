@@ -14,6 +14,15 @@ jQuery(document).ready(function($) {
             return;
         }
 
+        // Client-side domain validation
+        if (wgDownloaderAjax.sources && wgDownloaderAjax.sources[source]) {
+            const sourceData = wgDownloaderAjax.sources[source];
+            if (sourceData.domain && url.toLowerCase().indexOf(sourceData.domain.toLowerCase()) === -1) {
+                $status.css('color', '#dc3232').html('<strong>' + wgDownloaderAjax.domain_err + '</strong>');
+                return;
+            }
+        }
+
         $btn.prop('disabled', true);
         $spinner.addClass('is-active');
         $status.css('color', '#007cba').text(wgDownloaderAjax.packing);

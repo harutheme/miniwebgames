@@ -15,7 +15,18 @@ jQuery(document).ready(function($) {
             return;
         }
 
-        $statusMsg.removeClass('wg-status-success wg-status-error').text(wgScraperAjax.fetching);
+        // Client-side domain validation
+        if (wgScraperAjax.sources && wgScraperAjax.sources[source]) {
+            const sourceData = wgScraperAjax.sources[source];
+            if (sourceData.domain && url.toLowerCase().indexOf(sourceData.domain.toLowerCase()) === -1) {
+                $statusMsg.removeClass('wg-status-success wg-status-error')
+                          .addClass('wg-status-error')
+                          .html('<strong>' + wgScraperAjax.domain_err + '</strong>');
+                return;
+            }
+        }
+
+        $statusMsg.removeClass('wg-status-success wg-status-error').html('<span class="spinner is-active" style="float:none; margin:0 5px 0 0;"></span>' + wgScraperAjax.fetching);
         $fetchBtn.prop('disabled', true);
 
         $.ajax({
@@ -31,9 +42,12 @@ jQuery(document).ready(function($) {
                 $fetchBtn.prop('disabled', false);
                 
                 if (response.success) {
-                    $statusMsg.addClass('wg-status-success').text(wgScraperAjax.success);
-                    
                     const data = response.data;
+                    let msg = wgScraperAjax.success;
+                    if (data.download_msg) {
+                        msg = msg + '<br><span style="color:#e6a23c;">' + data.download_msg + '</span>';
+                    }
+                    $statusMsg.addClass('wg-status-success').html(msg);
                     
                     // Fill WP Title
                     if (data.title) {
@@ -98,6 +112,9 @@ jQuery(document).ready(function($) {
                     // Set wg_scraped_source_url for tracking
                     if (data.source_url) {
                         $('#wg_scraped_source_url').val(data.source_url);
+                    }
+                    if (data.original_iframe_url) {
+                        $('#wg_original_iframe_url').val(data.original_iframe_url);
                     }
 
                 } else {

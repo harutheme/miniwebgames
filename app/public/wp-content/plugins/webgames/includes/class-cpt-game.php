@@ -27,6 +27,10 @@ class Webgames_CPT_Game {
         
         add_action( 'game-tag_edit_form_fields', array( $this, 'edit_taxonomy_seo_field' ), 10, 2 );
         add_action( 'edited_game-tag', array( $this, 'save_taxonomy_seo_field' ), 10, 2 );
+
+        // Rank Math SEO filters
+        add_filter( 'rank_math/opengraph/facebook/image', array( $this, 'rank_math_term_image' ) );
+        add_filter( 'rank_math/opengraph/twitter/image', array( $this, 'rank_math_term_image' ) );
     }
 
     public function enqueue_admin_scripts( $hook ) {
@@ -268,5 +272,21 @@ class Webgames_CPT_Game {
             // Using wp_kses_post to allow safe HTML
             update_term_meta( $term_id, 'bottom_seo_content', wp_kses_post( $_POST['bottom_seo_content'] ) );
         }
+    }
+
+    public function rank_math_term_image( $attachment_url ) {
+        if ( is_tax( 'game-category' ) || is_tax( 'game-tag' ) ) {
+            $term = get_queried_object();
+            if ( $term ) {
+                $image_id = get_term_meta( $term->term_id, 'wg_category_image', true );
+                if ( $image_id ) {
+                    $image_url = wp_get_attachment_image_url( $image_id, 'full' );
+                    if ( $image_url ) {
+                        return $image_url;
+                    }
+                }
+            }
+        }
+        return $attachment_url;
     }
 }
