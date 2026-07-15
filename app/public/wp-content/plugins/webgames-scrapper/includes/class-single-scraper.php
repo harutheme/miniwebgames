@@ -93,6 +93,11 @@ class Webgames_Single_Scraper {
     public function handle_scrape_ajax() {
         check_ajax_referer( 'wg_scraper_nonce', 'security' );
 
+        // Increase limits for processing massive game files on production servers
+        @ini_set( 'memory_limit', '1024M' );
+        @ini_set( 'pcre.backtrack_limit', '100000000' );
+        @set_time_limit( 300 );
+
         if ( ! current_user_can( 'edit_posts' ) ) {
             wp_send_json_error( __( 'Permission denied.', 'webgames-scrapper' ) );
         }
@@ -325,14 +330,19 @@ class Webgames_Single_Scraper {
         if ( is_wp_error( $get_response ) ) return false;
         
         $html = wp_remote_retrieve_body( $get_response );
+        unset( $get_response ); // Free up massive memory block immediately
         if ( empty( $html ) ) return false;
 
         // Auto-replace loading text with dynamic domain script at download time (with fallback for file:// protocol)
-        $html = preg_replace(
-            '/(<[^>]+class=["\'][^"\']*loading-text[^"\']*["\'][^>]*>)(.*?)(<\/[^>]+>)/i',
-            '$1<script>document.write(window.location.hostname || "miniwebgames.com")</script>$3',
-            $html
-        );
+        // Optimized regex logic to prevent PCRE limits on 35MB string
+        if ( stripos( $html, 'loading-text' ) !== false ) {
+            $html = preg_replace(
+                '/(<[^>]+class=["\'][^"\']*loading-text[^"\']*["\'][^>]*>)(.*?)(<\/[^>]+>)/i',
+                '$1<script>document.write(window.location.hostname || "miniwebgames.com")</script>$3',
+                $html,
+                1
+            );
+        }
 
         $host = sanitize_text_field( $_SERVER['HTTP_HOST'] );
         $framebuster = "<script>
@@ -362,8 +372,16 @@ if (window.top !== window.self) {
         }
 
         require_once( ABSPATH . 'wp-admin/includes/file.php' );
+        
+        // Bypass FTP credentials prompt in AJAX by forcing direct method
+        add_filter( 'filesystem_method', function() { return 'direct'; }, 100 );
         WP_Filesystem();
         global $wp_filesystem;
+        
+        // Prevent fatal error if WP_Filesystem still fails to initialize
+        if ( ! is_object( $wp_filesystem ) ) {
+            return false;
+        }
 
         $upload_dir = wp_upload_dir();
         $base_dir = $upload_dir['basedir'] . '/webgames';
