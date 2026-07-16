@@ -118,6 +118,15 @@ class Webgames_Parser_Gamepix implements Webgames_Scraper_Parser_Interface {
     public function get_iframe_url() {
         if ( ! $this->is_valid_game_page() ) return '';
 
+        // --- LAYER 0: If Play button was clicked, there is a real iframe ---
+        $nodes = $this->xpath->query('//iframe[@id="game-iframe"]/@src | //div[contains(@class, "game-iframe-item")]//iframe/@src | //iframe[contains(@src, "games.gamepix.com")]/@src');
+        if ( $nodes->length > 0 ) {
+            $iframe_url = trim( $nodes->item(0)->nodeValue );
+            if ( filter_var( $iframe_url, FILTER_VALIDATE_URL ) ) {
+                return esc_url_raw( $iframe_url );
+            }
+        }
+
         // --- LAYER 1: Direct Extract from Svelte embedCode ---
         if ( preg_match( '/embedCode\s*:\s*"((?:[^"\\\\]|\\\\.)*)"/i', $this->html, $matches ) ) {
             $embed_code = $matches[1];

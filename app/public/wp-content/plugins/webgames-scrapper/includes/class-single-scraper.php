@@ -282,10 +282,13 @@ class Webgames_Single_Scraper {
         $this->check_duplicate_and_exit( $url, $data['original_iframe_url'] );
 
         // Smart Sideloading (CSP Checker)
-        $sideload_result = $this->maybe_sideload_game( $data['original_iframe_url'], $data['title'], $source );
-        if ( $sideload_result ) {
-            $data['iframe_url'] = $sideload_result['local_url'];
-            $data['download_msg'] = $sideload_result['msg'];
+        // Bypass sideload completely for gamepix because their embeds are fully authorized and Cloudflare false positives trigger unnecessary HTML downloads.
+        if ( $source !== 'gamepix' ) {
+            $sideload_result = $this->maybe_sideload_game( $data['original_iframe_url'], $data['title'], $source );
+            if ( $sideload_result ) {
+                $data['iframe_url'] = $sideload_result['local_url'];
+                $data['download_msg'] = $sideload_result['msg'];
+            }
         }
 
         // Sideload image if available
