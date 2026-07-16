@@ -174,25 +174,39 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
         <div class="webgames-player-wrapper" id="webgames-player-wrapper">
             <!-- Game Canvas / Iframe Area -->
             <div class="webgames-canvas-container" id="webgames-canvas-container">
-                <div class="wg-btn-exit-wrapper">
-                    <button class="wg-btn-exit-fullscreen" id="wg-btn-exit-fullscreen" style="display: none;" title="<?php _e('Exit Fullscreen', 'webgames'); ?>">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
-                    </button>
-                </div>
                 <div class="webgames-cover" id="webgames-cover">
                     <div class="wg-cover-bg" style="background-image: url('<?php echo esc_url( $cover_url ); ?>');"></div>
                     <div class="wg-cover-content">
                         <h2 class="wg-cover-title"><?php echo esc_html( $title ); ?></h2>
-                        <?php if ( ! empty( $thumb_url ) ) : ?>
+                        <?php
+                        $metadata = get_post_meta( $post_id, '_wg_gamepix_metadata', true );
+                        $is_desktop_only = false;
+                        if ( ! empty( $metadata ) && is_array( $metadata ) ) {
+                            if ( isset( $metadata['Platform'] ) && $metadata['Platform'] === 'Browser (Desktop)' ) {
+                                $is_desktop_only = true;
+                            }
+                        }
+                        $hide_for_mobile = $is_desktop_only && wp_is_mobile();
+                        ?>
+                        
+                        <?php if ( ! empty( $thumb_url ) && ! $hide_for_mobile ) : ?>
                             <div class="wg-cover-thumb-wrapper">
                                 <img src="<?php echo esc_url( $thumb_url ); ?>" alt="<?php echo esc_attr( $title ); ?>" class="wg-cover-thumb" />
                             </div>
                         <?php endif; ?>
-                        <div class="wg-cover-play-wrap">
-                            <button class="webgames-play-btn" id="webgames-play-btn" data-src="<?php echo esc_url( $game_url ); ?>">
-                                <span class="dashicons dashicons-controls-play"></span> <?php _e( 'PLAY NOW', 'webgames' ); ?>
-                            </button>
-                        </div>
+                        
+                        <?php if ( $hide_for_mobile ) : ?>
+                            <div class="mobile-not-available wg-not-available" style="background: rgba(0,0,0,0.7); padding: 20px; border-radius: 8px; text-align: center; color: #fff;">
+                                <p style="margin: 0 0 10px; font-weight: bold;">This game is not available<br>on the mobile web.</p>
+                                <p style="margin: 0; font-size: 14px;">Play it on desktop or try our suggested games!</p>
+                            </div>
+                        <?php else : ?>
+                            <div class="wg-cover-play-wrap">
+                                <button class="webgames-play-btn" id="webgames-play-btn" data-src="<?php echo esc_url( $game_url ); ?>">
+                                    <span class="dashicons dashicons-controls-play"></span> <?php _e( 'PLAY NOW', 'webgames' ); ?>
+                                </button>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="wg-iframe-wrapper">
@@ -228,7 +242,10 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
                             <span class="dashicons dashicons-flag"></span>
                         </button>
                         <button class="wg-btn wg-btn-fullscreen" id="wg-btn-fullscreen" data-tooltip="<?php _e('Fullscreen', 'webgames'); ?>">
-                            <span class="dashicons dashicons-editor-expand"></span>
+                            <svg height="24" width="24" viewBox="0 0 24 24" fill="currentColor" focusable="false"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"></path></svg>
+                        </button>
+                        <button class="wg-btn wg-btn-exit-fullscreen" id="wg-btn-exit-fullscreen" style="display: none;" data-tooltip="<?php _e('Exit Fullscreen', 'webgames'); ?>">
+                            <svg height="24" width="24" viewBox="0 0 24 24" fill="currentColor" focusable="false"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"></path></svg>
                         </button>
                     </div>
             </div>
@@ -1012,6 +1029,18 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
             <span><?php _e( 'Like this game', 'webgames' ); ?></span>
         </div>
         <?php
+        
+        $metadata = get_post_meta( $post_id, '_wg_gamepix_metadata', true );
+        if ( ! empty( $metadata ) && is_array( $metadata ) ) {
+            echo '<div class="wg-game-metadata" style="margin-bottom: 15px; font-size: 14px; color: #a4b0be; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">';
+            echo '<ul style="margin: 0; padding: 0; list-style: none;">';
+            foreach ( $metadata as $key => $val ) {
+                echo '<li style="margin-bottom: 5px;"><strong>' . esc_html( $key ) . ':</strong> ' . esc_html( $val ) . '</li>';
+            }
+            echo '</ul>';
+            echo '</div>';
+        }
+        
         return ob_get_clean();
     }
 

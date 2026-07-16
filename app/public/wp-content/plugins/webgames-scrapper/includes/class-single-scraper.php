@@ -56,6 +56,8 @@ class Webgames_Single_Scraper {
             <input type="hidden" id="wg_scraped_source_url" name="wg_scraped_source_url" value="<?php echo esc_attr( $existing_source ); ?>" />
             <?php $existing_original_iframe = get_post_meta( $post->ID, '_wg_original_iframe_url', true ); ?>
             <input type="hidden" id="wg_original_iframe_url" name="wg_original_iframe_url" value="<?php echo esc_attr( $existing_original_iframe ); ?>" />
+            <?php $existing_custom_meta = get_post_meta( $post->ID, '_wg_gamepix_metadata', true ); ?>
+            <input type="hidden" id="wg_gamepix_metadata" name="wg_gamepix_metadata" value="<?php echo esc_attr( wp_json_encode( $existing_custom_meta ) ); ?>" />
         </div>
         <?php
     }
@@ -69,6 +71,18 @@ class Webgames_Single_Scraper {
         }
         if ( isset( $_POST['wg_original_iframe_url'] ) && ! empty( $_POST['wg_original_iframe_url'] ) ) {
             update_post_meta( $post_id, '_wg_original_iframe_url', esc_url_raw( $_POST['wg_original_iframe_url'] ) );
+        }
+        
+        if ( isset( $_POST['wg_gamepix_metadata'] ) ) {
+            $metadata_raw = wp_unslash( $_POST['wg_gamepix_metadata'] );
+            if ( ! empty( $metadata_raw ) ) {
+                $metadata = json_decode( $metadata_raw, true );
+                if ( is_array( $metadata ) ) {
+                    update_post_meta( $post_id, '_wg_gamepix_metadata', $metadata );
+                }
+            } else {
+                delete_post_meta( $post_id, '_wg_gamepix_metadata' );
+            }
         }
     }
 
@@ -215,6 +229,7 @@ class Webgames_Single_Scraper {
             'source_url'          => $url, // Pass back to JS for tracking
             'original_iframe_url' => $parser->get_iframe_url(),
             'download_msg'        => '',
+            'custom_meta'         => method_exists( $parser, 'get_custom_meta' ) ? $parser->get_custom_meta() : null,
         );
 
         // Robust duplicate check including iframe URL

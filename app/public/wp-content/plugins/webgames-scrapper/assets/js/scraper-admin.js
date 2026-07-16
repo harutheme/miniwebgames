@@ -116,6 +116,11 @@ jQuery(document).ready(function($) {
                     if (data.original_iframe_url) {
                         $('#wg_original_iframe_url').val(data.original_iframe_url);
                     }
+                    if (data.custom_meta) {
+                        $('#wg_gamepix_metadata').val(JSON.stringify(data.custom_meta));
+                    } else {
+                        $('#wg_gamepix_metadata').val('');
+                    }
 
                 } else {
                     $statusMsg.addClass('wg-status-error').html('<strong>' + wgScraperAjax.error + '</strong><br>' + response.data);

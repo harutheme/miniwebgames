@@ -26,6 +26,7 @@ function webgames_scrapper_load_textdomain() {
 // Include Core Files
 require_once WEBGAMES_SCRAPPER_DIR . 'includes/class-source-registry.php';
 require_once WEBGAMES_SCRAPPER_DIR . 'includes/parsers/interface-parser.php';
+require_once WEBGAMES_SCRAPPER_DIR . 'includes/parsers/class-parser-gamepix.php';
 require_once WEBGAMES_SCRAPPER_DIR . 'includes/parsers/class-parser-musicgames.php';
 require_once WEBGAMES_SCRAPPER_DIR . 'includes/parsers/class-parser-sprunkia.php';
 require_once WEBGAMES_SCRAPPER_DIR . 'includes/parsers/class-parser-generic.php';

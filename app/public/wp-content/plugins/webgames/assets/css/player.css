@@ -247,6 +247,9 @@
     transform: translateX(-50%) translateY(0);
 }
 
+.wg-toolbar-right [data-tooltip]::after {
+    font-size: 10.4px;
+}
 
 .wg-btn:hover {
     background: rgba(255, 255, 255, 0.1);
@@ -997,34 +1000,7 @@
 /* ==========================================
    FULLSCREEN MODE (OPTION 2)
    ========================================== */
-.wg-btn-exit-fullscreen {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    z-index: 99999;
-    background: rgba(0, 0, 0, 0.6);
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
-}
 
-.wg-btn-exit-fullscreen:hover {
-    background: rgba(255, 71, 87, 0.9);
-    transform: scale(1.1);
-}
-
-.wg-btn-exit-fullscreen svg {
-    width: 24px;
-    height: 24px;
-    fill: #ffffff;
-}
 
 .webgames-canvas-container:fullscreen {
     width: 100vw !important;
@@ -1161,8 +1137,9 @@ body.dark-mode .wg-tag-grid li a:hover {
 /* ==========================================
    IOS PSEUDO-FULLSCREEN FALLBACK
    ========================================== */
-.wg-pseudo-fullscreen-body {
-    overflow: hidden !important;
+html.wg-pseudo-fullscreen-html,
+body.wg-pseudo-fullscreen-body {
+    overflow: hidden;
 }
 
 .wg-pseudo-fullscreen {
@@ -1176,10 +1153,44 @@ body.dark-mode .wg-tag-grid li a:hover {
     margin: 0 !important;
     padding: 0 !important;
     border-radius: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.wg-pseudo-fullscreen .webgames-canvas-container {
+    flex: 1 !important;
+    width: 100% !important;
+    height: 0 !important; /* Forces flex to calculate height dynamically */
+    aspect-ratio: auto !important;
+    border-radius: 0 !important;
+}
+
+.wg-pseudo-fullscreen .webgames-toolbar {
+    border-radius: 0 !important;
+    margin: 0 !important;
+    flex-direction: row;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    gap: 0;
+}
+
+.wg-pseudo-fullscreen .wg-toolbar-right {
+    width: auto;
+    justify-content: flex-end;
 }
 
 .wg-pseudo-fullscreen iframe {
     width: 100% !important;
     height: 100% !important;
     border-radius: 0 !important;
+}
+
+@media (max-width: 768px) {
+    .wg-pseudo-fullscreen .webgames-toolbar .wg-btn-like,
+    .wg-pseudo-fullscreen .webgames-toolbar .wg-btn-dislike,
+    .wg-pseudo-fullscreen .webgames-toolbar .wg-btn-fav,
+    .wg-pseudo-fullscreen .webgames-toolbar .wg-btn-share,
+    .wg-pseudo-fullscreen .webgames-toolbar .wg-btn-report {
+        display: none !important;
+    }
 }

@@ -16,6 +16,11 @@ class Webgames_Source_Registry {
      */
     public static function get_sources() {
         return array(
+            'gamepix' => array(
+                'label'        => 'GamePix',
+                'domain'       => 'gamepix.com',
+                'parser_class' => 'Webgames_Parser_Gamepix',
+            ),
             'musicgames' => array(
                 'label'        => 'musicgames.io',
                 'domain'       => 'musicgames.io',
