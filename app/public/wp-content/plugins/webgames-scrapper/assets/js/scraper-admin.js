@@ -47,6 +47,9 @@ jQuery(document).ready(function($) {
                     if (data.download_msg) {
                         msg = msg + '<br><span style="color:#e6a23c;">' + data.download_msg + '</span>';
                     }
+                    if (data.is_fallback) {
+                        msg = msg + '<br><span style="color:#ff4757; font-weight:bold;">' + wgScraperAjax.fallback_msg + '</span>';
+                    }
                     $statusMsg.addClass('wg-status-success').html(msg);
                     
                     // Fill WP Title

@@ -12,6 +12,7 @@ class Webgames_Parser_Sprunkia implements Webgames_Scraper_Parser_Interface {
     private $dom;
     private $xpath;
     private $html;
+    private $is_fallback = false;
 
     public function set_dom( DOMDocument $dom, DOMXPath $xpath, $html ) {
         $this->dom   = $dom;
@@ -99,9 +100,14 @@ class Webgames_Parser_Sprunkia implements Webgames_Scraper_Parser_Interface {
         foreach ( $iframes as $node ) {
             $src = $node->nodeValue;
             if ( strpos( $src, 'about:blank' ) === false ) {
+                $this->is_fallback = true;
                 return $src;
             }
         }
         return '';
+    }
+
+    public function is_iframe_fallback() {
+        return $this->is_fallback;
     }
 }

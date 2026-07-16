@@ -32,4 +32,9 @@ interface Webgames_Scraper_Parser_Interface {
      * Get the game iframe/source URL
      */
     public function get_iframe_url();
+
+    /**
+     * Check if the returned iframe URL is from a fallback method
+     */
+    public function is_iframe_fallback();
 }

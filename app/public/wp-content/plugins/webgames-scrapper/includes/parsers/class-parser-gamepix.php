@@ -12,6 +12,7 @@ class Webgames_Parser_Gamepix implements Webgames_Scraper_Parser_Interface {
     private $dom;
     private $xpath;
     private $html;
+    private $is_fallback = false;
 
     public function set_dom( DOMDocument $dom, DOMXPath $xpath, $html ) {
         $this->dom   = $dom;
@@ -139,11 +140,16 @@ class Webgames_Parser_Gamepix implements Webgames_Scraper_Parser_Interface {
             $og_url = rtrim( $og_url, '/' );
             if ( preg_match( '/\/play\/([^\/]+)$/i', $og_url, $matches ) ) {
                 $slug = $matches[1];
+                $this->is_fallback = true;
                 return 'https://play.gamepix.com/' . $slug . '/embed';
             }
         }
 
         return '';
+    }
+
+    public function is_iframe_fallback() {
+        return $this->is_fallback;
     }
 
     public function get_custom_meta() {

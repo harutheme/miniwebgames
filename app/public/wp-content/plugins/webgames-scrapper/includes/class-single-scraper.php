@@ -99,6 +99,7 @@ class Webgames_Single_Scraper {
                 'success'  => __( 'Success! Data filled.', 'webgames-scrapper' ),
                 'error'    => __( 'Error scraping URL.', 'webgames-scrapper' ),
                 'domain_err'=> __( 'Lỗi: URL nhập vào không thuộc hệ thống của Game Source đã chọn!', 'webgames-scrapper' ),
+                'fallback_msg'=> __( 'Lưu ý: Không tìm thấy URL nhúng chính thức. Hệ thống đã sử dụng Fallback (hoặc Default Iframe). Vui lòng kiểm tra lại thủ công xem iframe có hoạt động đúng không!', 'webgames-scrapper' ),
                 'sources'  => Webgames_Source_Registry::get_sources(),
             ) );
         }
@@ -226,6 +227,7 @@ class Webgames_Single_Scraper {
             'image_id'            => '',
             'image_error'         => '',
             'iframe_url'          => $parser->get_iframe_url(),
+            'is_fallback'         => method_exists( $parser, 'is_iframe_fallback' ) ? $parser->is_iframe_fallback() : false,
             'source_url'          => $url, // Pass back to JS for tracking
             'original_iframe_url' => $parser->get_iframe_url(),
             'download_msg'        => '',

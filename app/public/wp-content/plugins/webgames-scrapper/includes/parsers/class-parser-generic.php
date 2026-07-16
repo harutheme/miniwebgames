@@ -44,4 +44,8 @@ class Webgames_Parser_Generic implements Webgames_Scraper_Parser_Interface {
         }
         return '';
     }
+
+    public function is_iframe_fallback() {
+        return true; // Generic parser always uses a fallback method
+    }
 }
