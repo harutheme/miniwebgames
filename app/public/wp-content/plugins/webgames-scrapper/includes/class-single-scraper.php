@@ -42,6 +42,10 @@ class Webgames_Single_Scraper {
 
             <label for="wg-scraper-url"><?php esc_html_e( 'Target URL:', 'webgames-scrapper' ); ?></label>
             <input type="text" id="wg-scraper-url" placeholder="https://" class="widefat" style="margin-bottom:12px;"/>
+
+            <label for="wg-scraper-raw-html"><?php esc_html_e( 'Paste Raw HTML (Bypass Cloudflare):', 'webgames-scrapper' ); ?></label>
+            <textarea id="wg-scraper-raw-html" class="widefat" rows="4" placeholder="Paste HTML source code here to bypass Cloudflare..." style="margin-bottom:12px; font-family: monospace; font-size: 11px;"></textarea>
+
             <button type="button" id="wg-btn-fetch" class="button button-primary wg-btn-block">
                 <?php esc_html_e( 'Fetch Game Data', 'webgames-scrapper' ); ?>
             </button>
@@ -120,6 +124,22 @@ class Webgames_Single_Scraper {
         $url = isset( $_POST['url'] ) ? esc_url_raw( $_POST['url'] ) : '';
         $source = isset( $_POST['source'] ) ? sanitize_text_field( $_POST['source'] ) : 'musicgames';
         
+        // Spoof headers for all HTTP requests (especially image downloads) during this AJAX request
+        // This helps bypass basic CDN hotlink protection on Production servers
+        if ( $source === 'gamepix' ) {
+            add_filter( 'http_request_args', function( $args, $url ) {
+                if ( preg_match('/\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?.*)?$/i', $url) || strpos( $url, 'gamepix.com' ) !== false ) {
+                    if ( ! isset( $args['headers'] ) ) {
+                        $args['headers'] = array();
+                    }
+                    $args['headers']['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36';
+                    $args['headers']['Accept'] = 'image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8';
+                    $args['headers']['Referer'] = 'https://www.gamepix.com/';
+                }
+                return $args;
+            }, 10, 2 );
+        }
+        
         if ( empty( $url ) ) {
             wp_send_json_error( __( 'Invalid URL.', 'webgames-scrapper' ) );
         }
@@ -140,27 +160,33 @@ class Webgames_Single_Scraper {
         // Fast initial duplicate check before scraping
         $this->check_duplicate_and_exit( $url, '' );
 
-        $args = array(
-            'timeout' => 30,
-            'headers' => array(
-                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
-                'Accept'     => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                'Accept-Language' => 'en-US,en;q=0.5',
-            )
-        );
-        $response = wp_remote_get( $url, $args );
-        if ( is_wp_error( $response ) ) {
-            wp_send_json_error( $response->get_error_message() );
-        }
+        $raw_html = isset( $_POST['raw_html'] ) ? stripslashes( $_POST['raw_html'] ) : '';
 
-        $status_code = wp_remote_retrieve_response_code( $response );
-        if ( $status_code == 403 || $status_code == 503 ) {
-            wp_send_json_error( __( 'Bị chặn bởi Cloudflare (Anti-bot). Server gốc từ chối truy cập.', 'webgames-scrapper' ) );
-        }
+        if ( ! empty( $raw_html ) ) {
+            $html = $raw_html;
+        } else {
+            $args = array(
+                'timeout' => 30,
+                'headers' => array(
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+                    'Accept'     => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                    'Accept-Language' => 'en-US,en;q=0.5',
+                )
+            );
+            $response = wp_remote_get( $url, $args );
+            if ( is_wp_error( $response ) ) {
+                wp_send_json_error( $response->get_error_message() );
+            }
 
-        $html = wp_remote_retrieve_body( $response );
-        if ( empty( $html ) ) {
-            wp_send_json_error( __( 'Empty response from target.', 'webgames-scrapper' ) );
+            $status_code = wp_remote_retrieve_response_code( $response );
+            if ( $status_code == 403 || $status_code == 503 ) {
+                wp_send_json_error( __( 'Bị chặn bởi Cloudflare (Anti-bot). Server gốc từ chối truy cập. Gợi ý: Hãy dùng chức năng "Paste Raw HTML" để vượt qua.', 'webgames-scrapper' ) );
+            }
+
+            $html = wp_remote_retrieve_body( $response );
+            if ( empty( $html ) ) {
+                wp_send_json_error( __( 'Empty response from target.', 'webgames-scrapper' ) );
+            }
         }
 
         libxml_use_internal_errors( true );

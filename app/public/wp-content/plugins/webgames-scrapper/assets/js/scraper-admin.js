@@ -9,6 +9,7 @@ jQuery(document).ready(function($) {
         e.preventDefault();
         const url = $urlInput.val().trim();
         const source = $('#wg-scraper-source').val();
+        const raw_html = $('#wg-scraper-raw-html').val() || '';
 
         if (!url) {
             alert('Please enter a valid URL.');
@@ -36,7 +37,8 @@ jQuery(document).ready(function($) {
                 action: 'webgames_scrape_url',
                 security: wgScraperAjax.nonce,
                 url: url,
-                source: source
+                source: source,
+                raw_html: raw_html
             },
             success: function(response) {
                 $fetchBtn.prop('disabled', false);
