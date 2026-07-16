@@ -140,9 +140,22 @@ class Webgames_Single_Scraper {
         // Fast initial duplicate check before scraping
         $this->check_duplicate_and_exit( $url, '' );
 
-        $response = wp_remote_get( $url );
+        $args = array(
+            'timeout' => 30,
+            'headers' => array(
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+                'Accept'     => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language' => 'en-US,en;q=0.5',
+            )
+        );
+        $response = wp_remote_get( $url, $args );
         if ( is_wp_error( $response ) ) {
             wp_send_json_error( $response->get_error_message() );
+        }
+
+        $status_code = wp_remote_retrieve_response_code( $response );
+        if ( $status_code == 403 || $status_code == 503 ) {
+            wp_send_json_error( __( 'Bị chặn bởi Cloudflare (Anti-bot). Server gốc từ chối truy cập.', 'webgames-scrapper' ) );
         }
 
         $html = wp_remote_retrieve_body( $response );
@@ -233,6 +246,11 @@ class Webgames_Single_Scraper {
             'download_msg'        => '',
             'custom_meta'         => method_exists( $parser, 'get_custom_meta' ) ? $parser->get_custom_meta() : null,
         );
+
+        // Failsafe: Nếu cả Title và Iframe URL đều rỗng, chứng tỏ parse thất bại do bị chặn hoặc đổi HTML.
+        if ( empty( $data['title'] ) && empty( $data['iframe_url'] ) ) {
+            wp_send_json_error( __( 'Không tìm thấy dữ liệu game. Có thể cấu trúc trang đã thay đổi hoặc chặn truy cập.', 'webgames-scrapper' ) );
+        }
 
         // Robust duplicate check including iframe URL
         $this->check_duplicate_and_exit( $url, $data['original_iframe_url'] );
