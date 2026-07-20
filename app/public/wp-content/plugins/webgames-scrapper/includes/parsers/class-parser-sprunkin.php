@@ -21,15 +21,19 @@ class Webgames_Parser_Sprunkin implements Webgames_Scraper_Parser_Interface {
     }
 
     public function get_title() {
-        $nodes = $this->xpath->query('//*[contains(@class, "game-headline")]');
-        if ( $nodes->length > 0 ) {
-            return trim($nodes->item(0)->nodeValue);
-        }
-
+        // Ưu tiên og:title vì thường chuẩn xác hơn
         $nodes = $this->xpath->query('//meta[@property="og:title"]/@content');
         if ( $nodes->length > 0 ) {
             $title = $nodes->item(0)->nodeValue;
+            // Dọn dẹp các hậu tố phổ biến nếu có
+            $title = preg_replace('/(\s*[-|]\s*Play.*|\s*[-|]\s*Sprunkin.*)/i', '', $title);
             return trim($title);
+        }
+
+        // Fallback về game-headline
+        $nodes = $this->xpath->query('//*[contains(@class, "game-headline")]');
+        if ( $nodes->length > 0 ) {
+            return trim(preg_replace('/\s+/', ' ', $nodes->item(0)->nodeValue));
         }
         return '';
     }
@@ -41,14 +45,21 @@ class Webgames_Parser_Sprunkin implements Webgames_Scraper_Parser_Interface {
         if ( $entry_content->length > 0 ) {
             $node = $entry_content->item(0);
             
-            // Iterate over children and skip the element with class "rating"
-            foreach ( $node->childNodes as $child ) {
-                if ( $child instanceof DOMElement ) {
-                    $class = $child->getAttribute('class');
-                    if ( strpos($class, 'rating') !== false ) {
-                        continue;
+            // Mảng các class cần loại bỏ
+            $classes_to_remove = array('rating', 'breadcrumbs', 'game-headline');
+            
+            // Tìm và xóa các node này khỏi $node
+            foreach ($classes_to_remove as $cls) {
+                $removals = $this->xpath->query('.//*[contains(@class, "' . $cls . '")]', $node);
+                foreach ($removals as $r) {
+                    if ($r->parentNode) {
+                        $r->parentNode->removeChild($r);
                     }
                 }
+            }
+            
+            // Lấy HTML của các thành phần còn lại
+            foreach ( $node->childNodes as $child ) {
                 $description .= $this->dom->saveHTML($child);
             }
         }
