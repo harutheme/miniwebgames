@@ -29,6 +29,7 @@ require_once WEBGAMES_SCRAPPER_DIR . 'includes/parsers/interface-parser.php';
 require_once WEBGAMES_SCRAPPER_DIR . 'includes/parsers/class-parser-gamepix.php';
 require_once WEBGAMES_SCRAPPER_DIR . 'includes/parsers/class-parser-musicgames.php';
 require_once WEBGAMES_SCRAPPER_DIR . 'includes/parsers/class-parser-sprunkia.php';
+require_once WEBGAMES_SCRAPPER_DIR . 'includes/parsers/class-parser-sprunkin.php';
 require_once WEBGAMES_SCRAPPER_DIR . 'includes/parsers/class-parser-generic.php';
 
 require_once WEBGAMES_SCRAPPER_DIR . 'includes/class-api-importer.php';

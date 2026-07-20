@@ -31,6 +31,11 @@ class Webgames_Source_Registry {
                 'domain'       => 'sprunkia.com',
                 'parser_class' => 'Webgames_Parser_Sprunkia',
             ),
+            'sprunkin' => array(
+                'label'        => 'Sprunkin.com',
+                'domain'       => 'sprunkin.com',
+                'parser_class' => 'Webgames_Parser_Sprunkin',
+            ),
             'generic' => array(
                 'label'        => __( 'Auto Detect (Generic)', 'webgames-scrapper' ),
                 'domain'       => '', // Accepts any domain
