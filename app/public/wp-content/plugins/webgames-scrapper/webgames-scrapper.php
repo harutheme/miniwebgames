@@ -33,6 +33,7 @@ require_once WEBGAMES_SCRAPPER_DIR . 'includes/parsers/class-parser-generic.php'
 
 require_once WEBGAMES_SCRAPPER_DIR . 'includes/class-api-importer.php';
 require_once WEBGAMES_SCRAPPER_DIR . 'includes/class-single-scraper.php';
+require_once WEBGAMES_SCRAPPER_DIR . 'includes/class-csv-importer.php';
 require_once WEBGAMES_SCRAPPER_DIR . 'includes/class-html5-downloader.php';
 
 // Initialize modules
@@ -40,6 +41,7 @@ function webgames_scrapper_init() {
     if ( is_admin() ) {
         new Webgames_API_Importer();
         new Webgames_Single_Scraper();
+        new Webgames_CSV_Importer();
         new Webgames_HTML5_Downloader();
     }
 }

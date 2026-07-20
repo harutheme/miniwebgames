@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+<script>
+if (window.top !== window.self) {
+    var isAllowed = false;
+    var allowed = 'miniwebgames.local';
+    if (window.location.ancestorOrigins) {
+        for (var i = 0; i < window.location.ancestorOrigins.length; i++) {
+            if (window.location.ancestorOrigins[i].indexOf(allowed) !== -1) {
+                isAllowed = true; break;
+            }
+        }
+    } else {
+        try { if (document.referrer.indexOf(allowed) !== -1) isAllowed = true; } catch(e){}
+    }
+    if (!isAllowed) {
+        document.documentElement.innerHTML = '<div style="color:white;background:black;height:100vh;display:flex;align-items:center;justify-content:center;font-family:sans-serif;"><h1>Hotlinking is disabled.</h1></div>';
+        throw new Error('Hotlinking disabled.');
+    }
+}
+</script>
+
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Sprunki s WORLD All MOD</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: #6bf3ff;
+        color: white;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      }
+      #unity-container {
+        width: 100%;
+        height: 100vh;
+        position: relative;
+      }
+      #unity-canvas {
+        width: 100%;
+        height: 100%;
+        background: #6bf3ff;
+      }
+      .unity-mobile #unity-canvas {
+        width: 100%;
+        height: 100%;
+      }
+      #loading-cover {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        //background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #unity-loading-bar {
+        width: 80%;
+        max-width: 400px;
+        text-align: center;
+      }
+      #unity-logo {
+        max-width: 400px;
+        margin: 0 auto 20px;
+        position: relative;
+        animation: floatAnimation 3s ease-in-out infinite;
+      }
+      #unity-logo::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        height: 100%;
+        transform: translate(-50%, -50%);
+        background: inherit;
+        filter: blur(20px);
+        opacity: 0;
+        z-index: -1;
+        animation: glowAnimation 3s ease-in-out infinite;
+      }
+      #unity-logo img {
+        max-width: 100%;
+        height: auto;
+        transition: transform 0.3s ease;
+      }
+      #unity-logo:hover img {
+        transform: scale(1.05);
+      }
+      @keyframes floatAnimation {
+        0% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
+      @keyframes glowAnimation {
+        0% {
+          opacity: 0.2;
+          filter: blur(20px);
+        }
+        50% {
+          opacity: 0.4;
+          filter: blur(15px);
+        }
+        100% {
+          opacity: 0.2;
+          filter: blur(20px);
+        }
+      }
+      .logo-rays {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 120%;
+        height: 120%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        opacity: 0.5;
+        animation: rayRotation 10s linear infinite;
+      }
+      @keyframes rayRotation {
+        from {
+          transform: translate(-50%, -50%) rotate(0deg);
+        }
+        to {
+          transform: translate(-50%, -50%) rotate(360deg);
+        }
+      }
+      #unity-progress-bar-empty {
+        width: 100%;
+        height: 20px;
+        background: #333;
+        border-radius: 5px;
+        margin: 20px 0;
+        position: relative;
+        overflow: hidden;
+      }
+      #unity-progress-bar-full {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #4CAF50, #8BC34A);
+        border-radius: 5px;
+        transition: width 0.3s ease;
+        position: relative;
+      }
+      #unity-progress-bar-full::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          rgba(255,255,255,0) 0%,
+          rgba(255,255,255,0.2) 50%,
+          rgba(255,255,255,0) 100%
+        );
+        animation: shimmer 1.5s infinite;
+      }
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+      .spinner {
+        width: 40px;
+        height: 40px;
+        margin: 40px auto;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      #unity-fullscreen-button {
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      #unity-fullscreen-button:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+      }
+      #unity-fullscreen-button::before {
+        content: "";
+        display: block;
+        width: 16px;
+        height: 16px;
+        margin: 12px;
+        background: white;
+        clip-path: polygon(0 0, 100% 0, 100% 15%, 15% 15%, 15% 100%, 0 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas"></canvas>
+      <div id="loading-cover">
+        <div id="unity-loading-bar">
+          <div id="unity-logo">
+            <svg class="logo-rays" viewBox="0 0 100 100">
+              <g fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="0.5">
+                <circle cx="50" cy="50" r="45"/>
+                <circle cx="50" cy="50" r="40"/>
+                <line x1="50" y1="5" x2="50" y2="95"/>
+                <line x1="5" y1="50" x2="95" y2="50"/>
+                <line x1="15" y1="15" x2="85" y2="85"/>
+                <line x1="15" y1="85" x2="85" y2="15"/>
+              </g>
+            </svg>
+            <img src="logo.png" alt="Game Logo">
+          </div>
+          <div id="unity-progress-bar-empty">
+            <div id="unity-progress-bar-full"></div>
+          </div>
+          <div class="spinner"></div>
+        </div>
+      </div>
+      <button id="unity-fullscreen-button" style="display: none;" aria-label="Fullscreen"></button>
+    </div>
+
+    <script>
+      const hideFullScreenButton = "f";
+      const buildUrl = "Build";
+      const loaderUrl = buildUrl + "/bb0d9ecdb05db3e84da20bd14a4f84dc.loader.js";
+      const config = {
+        dataUrl: buildUrl + "/b5424332c85c56635bc9f1bbbe345f0b.data",
+        frameworkUrl: buildUrl + "/8c3af45c8738364cc70720e51bb113c6.framework.js",
+        codeUrl: buildUrl + "/7dd5d695fb7e5bcae393ad0aaa0557ee.wasm",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "JIMOU GAME",
+        productName: "Sprunki s WORLD All MOD",
+        productVersion: "1.2.2",
+      };
+
+      const isMobileDDDDDDD = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const container = document.querySelector("#unity-container");
+      const canvas = document.querySelector("#unity-canvas");
+      const loadingCover = document.querySelector("#loading-cover");
+      const progressBarEmpty = document.querySelector("#unity-progress-bar-empty");
+      const progressBarFull = document.querySelector("#unity-progress-bar-full");
+      const fullscreenButton = document.querySelector("#unity-fullscreen-button");
+      const spinner = document.querySelector('.spinner');
+
+      if (isMobileDDDDDDD) {
+        container.className = "unity-mobile";
+        config.devicePixelRatio = 1;
+      }
+
+      const canFullscreen = [
+        'exitFullscreen',
+        'webkitExitFullscreen',
+        'webkitCancelFullScreen',
+        'mozCancelFullScreen',
+        'msExitFullscreen',
+      ].some(key => key in document);
+
+
+      const script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          spinner.style.display = "none";
+          progressBarEmpty.style.display = "block";
+          progressBarFull.style.width = `${Math.round(progress * 100)}%`;
+        }).then((unityInstance) => {
+          loadingCover.style.display = "none";
+          if (canFullscreen && !hideFullScreenButton) {
+            fullscreenButton.style.display = "block";
+            fullscreenButton.onclick = () => {
+              unityInstance.SetFullscreen(1);
+            };
+          }
+        }).catch((message) => {
+          alert(`Error loading game: ${message}`);
+        });
+      };
+      document.body.appendChild(script);
+    </script>
+  </body>
+</html>
