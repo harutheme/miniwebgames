@@ -44,6 +44,62 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.warn('LocalStorage error', e);
                 }
             }
+
+            // --- 3. Loading Toast Notification (Conditional) ---
+            if (this.getAttribute('data-has-audio-notice') === 'true') {
+                const isMobile = window.innerWidth <= 768 || /Mobi|Android/i.test(navigator.userAgent);
+                const displayDuration = isMobile ? 15000 : 12000;
+
+                const playerWrapper = document.getElementById('webgames-player-wrapper');
+                if (playerWrapper) {
+                    // Check if container already exists
+                    let toastContainer = playerWrapper.querySelector('.wg-toast-container');
+                    if (!toastContainer) {
+                        toastContainer = document.createElement('div');
+                        toastContainer.className = 'wg-toast-container';
+                        playerWrapper.appendChild(toastContainer);
+                    }
+
+                    // Create Toast
+                    const toast = document.createElement('div');
+                    toast.className = 'wg-toast';
+                    
+                    let messageHTML = `<span>⏳ Game is loading heavy resources. Please wait...</span>`;
+                    if (isMobile) {
+                        messageHTML += `<br><span style="color: #ffb142; margin-top: 4px; display: inline-block;">💡 Note: Please turn off silent mode (ringer switch) to hear game audio.</span>`;
+                    }
+
+                    toast.innerHTML = `
+                        <div class="wg-toast-message">${messageHTML}</div>
+                        <button class="wg-toast-close" aria-label="Close">
+                            <svg height="20" width="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+                        </button>
+                    `;
+
+                    toastContainer.appendChild(toast);
+
+                    // Show animation (wait a tiny bit for DOM to update so transition works)
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            toast.classList.add('show');
+                        });
+                    });
+
+                    // Auto hide
+                    const hideToast = () => {
+                        toast.classList.remove('show');
+                        setTimeout(() => toast.remove(), 300);
+                    };
+
+                    const autoHideTimeout = setTimeout(hideToast, displayDuration);
+
+                    // Close button
+                    toast.querySelector('.wg-toast-close').addEventListener('click', () => {
+                        clearTimeout(autoHideTimeout);
+                        hideToast();
+                    });
+                }
+            }
         });
     }
 

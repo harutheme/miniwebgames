@@ -202,7 +202,16 @@ if ( is_search() && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'game'
                             </div>
                         <?php else : ?>
                             <div class="wg-cover-play-wrap">
-                                <button class="webgames-play-btn" id="webgames-play-btn" data-src="<?php echo esc_url( $game_url ); ?>">
+                                <?php
+                                $has_audio_notice = 'false';
+                                $game_categories = wp_get_post_terms( $post_id, 'game-category', array( 'fields' => 'slugs' ) );
+                                if ( ! is_wp_error( $game_categories ) && is_array( $game_categories ) ) {
+                                    if ( in_array( 'music', $game_categories ) || in_array( 'sprunki', $game_categories ) ) {
+                                        $has_audio_notice = 'true';
+                                    }
+                                }
+                                ?>
+                                <button class="webgames-play-btn" id="webgames-play-btn" data-src="<?php echo esc_url( $game_url ); ?>" data-has-audio-notice="<?php echo esc_attr( $has_audio_notice ); ?>">
                                     <span class="dashicons dashicons-controls-play"></span> <?php _e( 'PLAY NOW', 'webgames' ); ?>
                                 </button>
                             </div>

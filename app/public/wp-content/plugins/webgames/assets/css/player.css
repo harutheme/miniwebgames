@@ -1,5 +1,6 @@
 /* Player Container */
 .webgames-player-wrapper {
+    position: relative;
     margin-bottom: 20px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
@@ -1186,6 +1187,11 @@ body.wg-pseudo-fullscreen-body {
 }
 
 @media (max-width: 768px) {
+    .wg-pseudo-fullscreen .webgames-toolbar {
+        order: -1;
+        padding-top: max(10px, env(safe-area-inset-top));
+    }
+
     .wg-pseudo-fullscreen .webgames-toolbar .wg-btn-like,
     .wg-pseudo-fullscreen .webgames-toolbar .wg-btn-dislike,
     .wg-pseudo-fullscreen .webgames-toolbar .wg-btn-fav,
@@ -1193,4 +1199,72 @@ body.wg-pseudo-fullscreen-body {
     .wg-pseudo-fullscreen .webgames-toolbar .wg-btn-report {
         display: none !important;
     }
+}
+
+/* ==========================================
+   LOADING TOAST NOTIFICATION (M3 Style)
+   ========================================== */
+.wg-toast-container {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+    width: 90%;
+    max-width: 400px;
+}
+
+.wg-toast {
+    background: #2b2f36; /* M3 surface container high */
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* M3 elevation 2 */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 14px;
+    line-height: 1.4;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wg-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.wg-toast-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.wg-toast-message {
+    flex: 1;
+}
+
+.wg-toast-close {
+    background: transparent;
+    border: none;
+    color: #a4b0be;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s, color 0.2s;
+}
+
+.wg-toast-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
 }
