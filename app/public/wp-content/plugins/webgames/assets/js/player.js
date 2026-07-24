@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // --- 3. Loading Toast Notification (Conditional) ---
             if (this.getAttribute('data-has-audio-notice') === 'true') {
                 const isMobile = window.innerWidth <= 768 || /Mobi|Android/i.test(navigator.userAgent);
-                const displayDuration = isMobile ? 15000 : 12000;
+                const displayDuration = isMobile ? 12000 : 10000;
 
                 const playerWrapper = document.getElementById('webgames-player-wrapper');
                 if (playerWrapper) {
